@@ -6,7 +6,7 @@
         <div
           class="md:grid md:grid-cols-[minmax(0,1fr)_6rem_8rem_6rem] md:gap-x-6 gap-y-8 max-h-[calc(100vh-20rem)] overflow-y-auto"
         >
-          <CartItemsColumnHeaders class="sticky top-0 bg-white" />
+          <CartItemsColumnHeaders />
           <CartItem
             v-for="item in cartItems"
             :key="item.id"
