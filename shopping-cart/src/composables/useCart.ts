@@ -9,25 +9,26 @@ import {
 import useApi from "./useApi";
 import { createDummyCartItem } from "@/utils/cart";
 
+// data
+const cartItems = ref<CartItem[]>([]); // allows state sharing
+const isFetching = ref(false);
+const summary = computed<CartSummary>(() => {
+  const total = cartItems.value.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0,
+  );
+  const tax = total * STANDARD_TAX_RATE;
+  return {
+    total: Number(total.toFixed(2)),
+    tax: Number(tax.toFixed(2)),
+    count: cartItems.value.length,
+    shippingCost: 0,
+    totalWithTax: Number((total + tax).toFixed(2)),
+  };
+});
+
 export default function useCart() {
   const { apiCall } = useApi();
-  // data
-  const cartItems = ref<CartItem[]>([]);
-  const isFetching = ref(false);
-  const summary = computed<CartSummary>(() => {
-    const total = cartItems.value.reduce(
-      (acc, item) => acc + item.price * item.quantity,
-      0,
-    );
-    const tax = total * STANDARD_TAX_RATE;
-    return {
-      total: Number(total.toFixed(2)),
-      tax: Number(tax.toFixed(2)),
-      count: cartItems.value.length,
-      shippingCost: 0,
-      totalWithTax: Number((total + tax).toFixed(2)),
-    };
-  });
 
   // methods
   const fetchCartItems = async () => {

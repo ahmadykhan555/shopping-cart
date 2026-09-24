@@ -33,6 +33,7 @@ import CartItem from "@/components/cart/CartItem.vue";
 import CartSummary from "@/components/cart/CartSummary.vue";
 import CartItemsColumnHeaders from "@/components/cart/CartItemsColumnHeaders.vue";
 import CartActions from "@/components/cart/CartActions.vue";
+
 const {
   cartItems,
   summary,
@@ -44,6 +45,8 @@ const {
 } = useCart();
 
 onMounted(() => {
-  fetchCartItems();
+  if (!isFetching.value && !cartItems.value.length) {
+    fetchCartItems();
+  }
 });
 </script>

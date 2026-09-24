@@ -28,7 +28,7 @@
 import type { CartSummary } from "@/types";
 import { formatMoney } from "@/utils";
 
-const props = defineProps<{
+defineProps<{
   summary: CartSummary;
 }>();
 </script>
