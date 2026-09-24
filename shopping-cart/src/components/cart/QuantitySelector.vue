@@ -1,8 +1,10 @@
 <template>
-  <div class="flex items-center gap-2 rounded-md w-24">
+  <div
+    class="inline-flex h-9 w-30 shrink-0 items-center self-start overflow-hidden rounded-md bg-gray-100"
+  >
     <button
       @click="selectedQuantity > minQuantity && selectedQuantity--"
-      class="flex-1 border border-gray-300 p-2"
+      class="flex h-full w-9 shrink-0 cursor-pointer items-center justify-center bg-transparent text-lg font-normal leading-none text-gray-500 transition-colors hover:bg-gray-200/80 active:bg-gray-200"
     >
       -
     </button>
@@ -11,12 +13,12 @@
       v-model="selectedQuantity"
       :min="minQuantity"
       :max="maxQuantity"
-      class="w-10 text-center"
+      class="h-full min-h-0 min-w-0 flex-1 border-0 bg-gray-50/90 p-0 text-center text-base font-medium leading-none tabular-nums text-gray-700 focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
       @input="$emit('update:quantity', sanitizeInput(selectedQuantity))"
     />
     <button
       @click="selectedQuantity < maxQuantity && selectedQuantity++"
-      class="flex-1 border border-gray-300 p-2"
+      class="flex h-full w-9 shrink-0 cursor-pointer items-center justify-center bg-transparent text-lg font-normal leading-none text-gray-500 transition-colors hover:bg-gray-200/80 active:bg-gray-200"
     >
       +
     </button>
