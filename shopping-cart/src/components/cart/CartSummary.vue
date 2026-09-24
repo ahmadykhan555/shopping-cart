@@ -15,7 +15,7 @@
     </div>
     <div class="flex justify-between px-1 py-2">
       <p>Total</p>
-      <p>{{ summary.total }}</p>
+      <p>{{ summary.totalWithTax }}</p>
     </div>
 
     <button class="bg-green-500 text-white px-4 py-2 rounded-md">
