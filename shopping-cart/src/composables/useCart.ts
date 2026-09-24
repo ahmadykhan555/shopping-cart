@@ -5,6 +5,7 @@ import {
   FETCH_CART_ITEMS_URL,
   ADD_ITEM_TO_CART_URL,
   FETCH_ITEM_BY_ID_URL,
+  MAX_CART_ITEMS,
 } from "@/consts";
 import useApi from "./useApi";
 
@@ -14,7 +15,10 @@ export default function useCart() {
   const cartItems = ref<CartItem[]>([]);
   const isFetching = ref(false);
   const summary = computed<CartSummary>(() => {
-    const total = cartItems.value.reduce((acc, item) => acc + item.price, 0);
+    const total = cartItems.value.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0,
+    );
     const tax = total * STANDARD_TAX_RATE;
     return {
       total: Number(total.toFixed(2)),
@@ -34,15 +38,17 @@ export default function useCart() {
         "Content-Type": "application/json",
       },
     });
-    cartItems.value = rawCartItems.map((item: any) => ({
-      id: item.id,
-      title: item.title,
-      price: item.price,
-      description: item.description,
-      category: item.category,
-      image: item.image,
-      quantity: item.quantity ?? 1,
-    }));
+    cartItems.value = rawCartItems
+      .slice(0, MAX_CART_ITEMS)
+      .map((item: any) => ({
+        id: item.id,
+        title: item.title,
+        price: item.price,
+        description: item.description,
+        category: item.category,
+        image: item.image,
+        quantity: item.quantity ?? 1,
+      }));
     isFetching.value = false;
   };
 
@@ -69,6 +75,12 @@ export default function useCart() {
 
   const clearCart = () => (cartItems.value = []);
 
+  const updateItemQuantity = async (id: number, quantity: number) => {
+    cartItems.value = cartItems.value.map((item) =>
+      item.id === id ? { ...item, quantity } : item,
+    );
+  };
+
   return {
     summary,
     cartItems,
@@ -77,5 +89,6 @@ export default function useCart() {
     addItemToCart,
     removeItemFromCart,
     clearCart,
+    updateItemQuantity,
   };
 }

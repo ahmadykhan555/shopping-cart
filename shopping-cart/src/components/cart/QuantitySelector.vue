@@ -22,7 +22,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 const props = defineProps<{
   quantity: number;
@@ -30,7 +30,11 @@ const props = defineProps<{
 
 const selectedQuantity = ref(props.quantity);
 
-defineEmits<{
+const emit = defineEmits<{
   (e: "update:quantity", quantity: number): void;
 }>();
+
+watch(selectedQuantity, () => {
+  emit("update:quantity", selectedQuantity.value);
+});
 </script>

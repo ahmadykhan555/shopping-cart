@@ -7,7 +7,7 @@
     <p>{{ item.price }}</p>
     <QuantitySelector
       :quantity="item.quantity"
-      @update:quantity="handleQuantityUpdate($event)"
+      @update:quantity="updateItemQuantity(item.id, $event)"
     />
     <p>{{ item.price * item.quantity }}</p>
   </article>
@@ -18,9 +18,6 @@ import QuantitySelector from "./QuantitySelector.vue";
 
 const props = defineProps<{
   item: CartItem;
+  updateItemQuantity: (id: number, quantity: number) => void;
 }>();
-
-const handleQuantityUpdate = (quantity: number) => {
-  console.log(quantity);
-};
 </script>
