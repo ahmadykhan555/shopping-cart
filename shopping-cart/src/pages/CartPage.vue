@@ -2,9 +2,9 @@
   <div>
     <div v-if="!isFetching" class="flex items-start gap-24">
       <p v-if="!cartItems.length">No items in cart</p>
-      <div v-else>
+      <div v-else class="min-w-0 flex-1">
         <div
-          class="md:grid md:grid-cols-[minmax(0,1fr)_6rem_8rem_6rem] md:gap-x-6 gap-y-8 max-h-[calc(100vh-20rem)] overflow-y-auto"
+          class="w-full min-w-0 md:grid md:grid-cols-[minmax(0,1fr)_7rem_8rem_7rem] md:gap-x-6 max-h-[calc(100vh-20rem)] overflow-y-auto"
         >
           <CartItemsColumnHeaders />
           <CartItem
@@ -33,7 +33,6 @@ import CartItem from "@/components/cart/CartItem.vue";
 import CartSummary from "@/components/cart/CartSummary.vue";
 import CartItemsColumnHeaders from "@/components/cart/CartItemsColumnHeaders.vue";
 import CartActions from "@/components/cart/CartActions.vue";
-
 const {
   cartItems,
   summary,
@@ -46,6 +45,7 @@ const {
 
 onMounted(() => {
   if (!isFetching.value && !cartItems.value.length) {
+    // only fetch if not already fetching and no items in cart
     fetchCartItems();
   }
 });
