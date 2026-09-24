@@ -1,7 +1,8 @@
 <template>
   <div>
-    <div v-if="!isFetching && cartItems.length" class="flex items-start gap-24">
-      <div>
+    <div v-if="!isFetching" class="flex items-start gap-24">
+      <p v-if="!cartItems.length">No items in cart</p>
+      <div v-else>
         <div
           class="md:grid md:grid-cols-[minmax(0,1fr)_6rem_8rem_6rem] md:gap-x-6 gap-y-8 max-h-[calc(100vh-20rem)] overflow-y-auto"
         >
@@ -21,7 +22,7 @@
         <CartSummary :summary="summary" />
       </div>
     </div>
-    <div v-else>No items in cart</div>
+    <div v-else>Fetching cart items...</div>
   </div>
 </template>
 

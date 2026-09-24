@@ -4,16 +4,17 @@
       <img :src="item.image" :alt="item.title" class="w-16 h-16 object-cover" />
       <h3>{{ item.title }}</h3>
     </div>
-    <p>{{ item.price }}</p>
+    <p>{{ formatMoney(item.price) }}</p>
     <QuantitySelector
       :quantity="item.quantity"
       @update:quantity="updateItemQuantity(item.id, $event)"
     />
-    <p>{{ item.price * item.quantity }}</p>
+    <p>{{ formatMoney(item.price * item.quantity) }}</p>
   </article>
 </template>
 <script setup lang="ts">
 import type { CartItem } from "@/types";
+import { formatMoney } from "@/utils";
 import QuantitySelector from "./QuantitySelector.vue";
 
 const props = defineProps<{

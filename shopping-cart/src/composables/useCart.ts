@@ -4,10 +4,10 @@ import {
   STANDARD_TAX_RATE,
   FETCH_CART_ITEMS_URL,
   ADD_ITEM_TO_CART_URL,
-  FETCH_ITEM_BY_ID_URL,
   MAX_CART_ITEMS,
 } from "@/consts";
 import useApi from "./useApi";
+import { createDummyCartItem } from "@/utils/cart";
 
 export default function useCart() {
   const { apiCall } = useApi();
@@ -59,13 +59,7 @@ export default function useCart() {
     });
 
     if (response.id) {
-      const addedItem = await apiCall<CartItem>(
-        FETCH_ITEM_BY_ID_URL(response.id),
-      );
-
-      if (addedItem) {
-        cartItems.value.push(addedItem);
-      }
+      cartItems.value.push(createDummyCartItem(response.id)); // API doesnt return the item so we create a dummy one
     }
   };
 
