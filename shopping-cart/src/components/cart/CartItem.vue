@@ -1,6 +1,6 @@
 <template>
   <article
-    class="w-full min-w-0 border-b border-gray-200 py-8 md:col-span-full md:grid md:grid-cols-subgrid md:items-center"
+    class="w-full min-w-0 border-b border-gray-200 py-8 md:col-span-full md:grid md:grid-cols-subgrid md:items-start"
   >
     <div class="flex min-w-0 items-start gap-4">
       <img

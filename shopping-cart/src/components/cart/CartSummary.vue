@@ -18,7 +18,11 @@
       <p>{{ formatMoney(summary.totalWithTax) }}</p>
     </div>
 
-    <button class="bg-green-500 text-white px-4 py-2 rounded-md">
+    <button
+      type="button"
+      class="rounded-md bg-green-500 px-4 py-2 text-white transition-colors hover:bg-green-600"
+      @click="handleCheckout"
+    >
       Checkout
     </button>
   </div>
@@ -26,9 +30,16 @@
 
 <script setup lang="ts">
 import type { CartSummary } from "@/types";
+import { useToast } from "@/composables/useToast";
 import { formatMoney } from "@/utils";
 
 defineProps<{
   summary: CartSummary;
 }>();
+
+const { success } = useToast();
+
+const handleCheckout = () => {
+  success("Proceeding to checkout…");
+};
 </script>
