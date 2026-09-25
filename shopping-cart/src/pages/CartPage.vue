@@ -8,8 +8,8 @@
         >
           <CartItemsColumnHeaders />
           <CartItem
-            v-for="item in cartItems"
-            :key="item.id"
+            v-for="(item, idx) in cartItems"
+            :key="idx"
             :item="item"
             :updateItemQuantity="
               (id, quantity) => updateItemQuantity(id, quantity)

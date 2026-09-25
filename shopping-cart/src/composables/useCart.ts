@@ -8,6 +8,7 @@ import {
 } from "@/consts";
 import useApi from "./useApi";
 import { createDummyCartItem } from "@/utils/cart";
+import { useToast } from "./useToast";
 
 // data
 const cartItems = ref<CartItem[]>([]); // allows state sharing
@@ -29,39 +30,52 @@ const summary = computed<CartSummary>(() => {
 
 export default function useCart() {
   const { apiCall } = useApi();
+  const { success } = useToast();
 
   // methods
   const fetchCartItems = async () => {
     isFetching.value = true;
-    const rawCartItems = await apiCall<CartItem[]>(FETCH_CART_ITEMS_URL, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
+    await apiCall<CartItem[]>(
+      FETCH_CART_ITEMS_URL,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    });
-    cartItems.value = rawCartItems
-      .slice(0, MAX_CART_ITEMS)
-      .map((item: any) => ({
-        id: item.id,
-        title: item.title,
-        price: item.price,
-        description: item.description,
-        category: item.category,
-        image: item.image,
-        quantity: item.quantity ?? 1,
-      }));
+      (rawCartItems) => {
+        cartItems.value = rawCartItems.slice(0, MAX_CART_ITEMS).map((item) => ({
+          id: item.id,
+          title: item.title,
+          price: item.price,
+          description: item.description,
+          category: item.category,
+          image: item.image,
+          quantity: item.quantity ?? 1,
+        }));
+      },
+    );
     isFetching.value = false;
   };
 
-  const addItemToCart = async (item: CartItem) => {
-    const response = await apiCall<{ id: number }>(ADD_ITEM_TO_CART_URL, {
-      method: "POST",
-      body: JSON.stringify(item),
-    });
+  const addItemToCart = async () => {
+    const newItem = createDummyCartItem(Date.now());
 
-    if (response.id) {
-      cartItems.value.push(createDummyCartItem(response.id)); // API doesnt return the item so we create a dummy one
-    }
+    await apiCall(
+      ADD_ITEM_TO_CART_URL,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: newItem.title,
+          price: newItem.price,
+        }),
+      },
+      () => {
+        cartItems.value.push(newItem);
+        success(`"${newItem.title}" added to cart`);
+      },
+    );
   };
 
   const removeItemFromCart = async (id: number) => {

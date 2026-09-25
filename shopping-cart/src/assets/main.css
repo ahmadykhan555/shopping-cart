@@ -1,5 +1,7 @@
-@import 'tailwindcss';
- 
+@import "tailwindcss";
+@import "notivue/notification.css";
+@import "notivue/animations.css";
+
 @layer base {
     * {
         /* hide scrollbar */

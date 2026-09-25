@@ -11,6 +11,7 @@
     "type-check": "vue-tsc --build"
   },
   "dependencies": {
+    "notivue": "^2.4.5",
     "vue": "^3.5.42",
     "vue-router": "^5.3.1"
   },
