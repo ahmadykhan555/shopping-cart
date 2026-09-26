@@ -25,16 +25,16 @@
 </template>
 
 <script setup lang="ts">
-import { useToast } from "@/composables/useToast";
 import { formatMoney } from "@/utils";
 import { computed } from "vue";
+import { useRouter } from "vue-router";
 import useCart from "@/composables/useCart";
 import AppButton from "../base/AppButton.vue";
 import CartSummaryItem from "./CartSummaryItem.vue";
-import useTotalWithShippingCost from "@/composables/useTotalWithShippingCost.ts";
+import useTotalWithShippingCost from "@/composables/useTotalWithShippingCost";
 
-const { success } = useToast();
-const { isFetching, summary } = useCart();
+const router = useRouter();
+const { isFetching, summary, cartItems, clearCart } = useCart();
 const { totalWithoutShippingCost, totalWithShippingCost, shippingCost } =
   useTotalWithShippingCost();
 
@@ -62,7 +62,29 @@ const summaryItems = computed(() => [
 ]);
 
 const handleCheckout = () => {
-  success("Proceeding to checkout…");
+  const itemCount = cartItems.value.length;
+  if (itemCount < 1) {
+    return;
+  }
+
+  const total = shippingCost.value
+    ? totalWithShippingCost.value
+    : totalWithoutShippingCost.value;
+
+  void router.push({
+    path: "/checkout/success",
+    state: {
+      itemCount,
+      orderSummary: {
+        itemCount,
+        subtotal: summary.value.total,
+        shipping: shippingCost.value,
+        tax: summary.value.tax,
+        total,
+      },
+    },
+  });
+  clearCart();
 };
 
 const isCheckoutDisabled = computed(

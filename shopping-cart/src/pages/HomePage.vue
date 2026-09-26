@@ -2,9 +2,7 @@
   <div
     class="flex min-h-[calc(100vh-12rem)] flex-col items-center justify-center px-4 text-center"
   >
-    <h1
-      class="text-2xl font-semibold tracking-tight text-gray-900 md:text-4xl"
-    >
+    <h1 class="text-2xl font-semibold tracking-tight text-gray-900 md:text-4xl">
       Home
     </h1>
 

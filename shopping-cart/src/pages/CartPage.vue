@@ -16,30 +16,45 @@
       Loading cart…
     </div>
 
-    <div v-else-if="!cartItems.length" class="py-12 text-sm text-gray-600">
-      No items in cart. Use “Add item” after loading products.
-    </div>
-
     <div
       v-else
       class="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-16"
     >
       <div class="min-w-0 flex-1">
         <div
-          class="max-h-[calc(100vh-20rem)] w-full min-w-0 overflow-y-auto md:grid md:grid-cols-[minmax(0,1fr)_7rem_8rem_7rem] md:gap-x-6"
+          v-if="cartItems.length"
+          class="relative max-h-[calc(100vh-20rem)] w-full min-w-0"
         >
-          <CartItemsColumnHeaders />
-          <CartItem
-            v-for="item in cartItems"
-            :key="item.id"
-            :item="item"
-            :updateItemQuantity="
-              (id, quantity) => updateItemQuantity(id, quantity)
-            "
-            @remove="removeItemFromCart"
+          <div
+            class="h-full max-h-[calc(100vh-20rem)] overflow-y-auto pb-[4.75rem] md:grid md:grid-cols-[minmax(0,1fr)_7rem_8rem_7rem] md:gap-x-6"
+          >
+            <CartItemsColumnHeaders class="max-md:hidden" />
+            <CartItem
+              v-for="item in cartItems"
+              :key="item.id"
+              :item="item"
+              :updateItemQuantity="
+                (id, quantity) => updateItemQuantity(id, quantity)
+              "
+              @remove="removeItemFromCart"
+            />
+          </div>
+          <CartActions
+            class="absolute inset-x-0 bottom-0 z-10 border-t border-gray-200/80 bg-white/75 backdrop-blur-md"
+            @addItem="addItemToCart"
+            @clearCart="clearCart"
           />
         </div>
-        <CartActions @addItem="addItemToCart" @clearCart="clearCart" />
+        <template v-else>
+          <p class="py-12 text-sm text-gray-600">
+            No items in cart. Use “Add item” to add products.
+          </p>
+          <CartActions
+            class="mt-8"
+            @addItem="addItemToCart"
+            @clearCart="clearCart"
+          />
+        </template>
       </div>
 
       <aside class="w-full shrink-0 lg:sticky lg:top-24 lg:w-80 xl:w-96">
