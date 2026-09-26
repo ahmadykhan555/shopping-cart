@@ -1,51 +1,71 @@
 <template>
-  <div class="flex flex-col gap-2">
-    <div class="flex justify-between px-1 py-2 border-b border-gray-200">
-      <p>Subtotal</p>
-      <p>{{ formatMoney(summary.total) }}</p>
+  <div class="rounded-xl border border-gray-200 bg-gray-50/50 p-6">
+    <h2 class="mb-5 text-lg font-semibold text-gray-900">Order summary</h2>
+
+    <div class="flex flex-col">
+      <CartSummaryItem
+        v-for="(item, index) in summaryItems"
+        :key="item.label"
+        :emphasis="item.label === 'Total'"
+      >
+        <template #label>{{ item.label }}</template>
+        {{ item.value }}
+      </CartSummaryItem>
     </div>
 
-    <div class="flex justify-between px-1 py-2 border-b border-gray-400">
-      <p>Shipping</p>
-      <p>{{ formatMoney(summary.shippingCost) }}</p>
-    </div>
-    <div class="flex justify-between px-1 py-2 border-b border-gray-400">
-      <p>Tax</p>
-      <p>{{ formatMoney(summary.tax) }}</p>
-    </div>
-    <div class="flex justify-between px-1 py-2">
-      <p>Total</p>
-      <p>{{ formatMoney(summary.totalWithTax) }}</p>
-    </div>
-
-    <button
+    <AppButton
+      class="mt-2 w-full py-3"
+      variant="secondary"
       :disabled="isCheckoutDisabled"
-      type="button"
-      :class="{ 'opacity-50 cursor-not-allowed': isCheckoutDisabled }"
-      class="rounded-md bg-green-500 px-4 py-2 text-white transition-colors hover:bg-green-600"
       @click="handleCheckout"
     >
       Checkout
-    </button>
+    </AppButton>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { CartSummary } from "@/types";
 import { useToast } from "@/composables/useToast";
 import { formatMoney } from "@/utils";
 import { computed } from "vue";
-const props = defineProps<{
-  summary: CartSummary;
-}>();
+import useCart from "@/composables/useCart";
+import AppButton from "../base/AppButton.vue";
+import CartSummaryItem from "./CartSummaryItem.vue";
+import useTotalWithShippingCost from "@/composables/useTotalWithShippingCost.ts";
 
 const { success } = useToast();
+const { isFetching, summary } = useCart();
+const { totalWithoutShippingCost, totalWithShippingCost, shippingCost } =
+  useTotalWithShippingCost();
+
+const summaryItems = computed(() => [
+  {
+    label: "Subtotal",
+    value: formatMoney(summary.value.total),
+  },
+  {
+    label: "Shipping",
+    value: formatMoney(shippingCost.value),
+  },
+  {
+    label: "Tax",
+    value: formatMoney(summary.value.tax),
+  },
+  {
+    label: "Total",
+    value: formatMoney(
+      shippingCost.value
+        ? totalWithShippingCost.value
+        : totalWithoutShippingCost.value,
+    ),
+  },
+]);
 
 const handleCheckout = () => {
   success("Proceeding to checkout…");
 };
 
-const isCheckoutDisabled = computed(() => {
-  return props.isFetching || !props.summary.total;
-});
+const isCheckoutDisabled = computed(
+  () => isFetching.value || !summary.value.total,
+);
 </script>

@@ -2,13 +2,15 @@
   <div
     class="flex min-h-[calc(100vh-12rem)] flex-col items-center justify-center px-4 text-center"
   >
-    <h1 class="text-4xl font-semibold tracking-tight text-gray-900 md:text-5xl">
+    <h1
+      class="text-2xl font-semibold tracking-tight text-gray-900 md:text-4xl"
+    >
       Home
     </h1>
 
     <p
       v-if="cartItems.length"
-      class="mt-4 max-w-md text-lg text-gray-600 md:text-xl"
+      class="mt-4 max-w-md text-base text-gray-600 md:text-lg"
     >
       You have
       <span class="font-semibold text-gray-900">{{ cartItems.length }}</span>
@@ -24,7 +26,7 @@
     </RouterLink>
 
     <template v-else>
-      <p class="mt-4 max-w-md text-lg text-gray-600 md:text-xl">
+      <p class="mt-4 max-w-md text-base text-gray-600 md:text-lg">
         Your cart is empty. Head to the cart to browse products.
       </p>
       <RouterLink

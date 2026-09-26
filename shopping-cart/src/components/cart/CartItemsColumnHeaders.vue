@@ -1,10 +1,26 @@
 <template>
   <div
-    class="sticky top-0 z-10 bg-white w-full min-w-0 md:col-span-full md:grid md:grid-cols-subgrid"
+    class="sticky top-0 z-10 w-full min-w-0 border-b border-gray-200 bg-white/90 backdrop-blur-sm md:col-span-full md:grid md:grid-cols-subgrid md:items-end"
   >
-    <div class="font-semibold text-[#1e2a4a]">Product</div>
-    <div class="font-semibold text-[#1e2a4a]">Price</div>
-    <div class="font-semibold text-[#1e2a4a]">Quantity</div>
-    <div class="font-semibold text-[#1e2a4a]">Total</div>
+    <div
+      class="pb-3 text-xs font-semibold uppercase tracking-wider text-gray-500"
+    >
+      Product
+    </div>
+    <div
+      class="pb-3 text-xs font-semibold uppercase tracking-wider text-gray-500"
+    >
+      Price
+    </div>
+    <div
+      class="pb-3 text-xs font-semibold uppercase tracking-wider text-gray-500"
+    >
+      Quantity
+    </div>
+    <div
+      class="pb-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500 md:text-left"
+    >
+      Total
+    </div>
   </div>
 </template>

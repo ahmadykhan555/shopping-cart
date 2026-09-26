@@ -1,23 +1,26 @@
 <template>
   <article
-    class="w-full min-w-0 border-b border-gray-200 py-8 md:col-span-full md:grid md:grid-cols-subgrid md:items-start"
+    class="w-full min-w-0 border-b border-gray-100 py-6 md:col-span-full md:grid md:grid-cols-subgrid md:items-center"
   >
-    <div class="flex min-w-0 items-start gap-4">
+    <div class="flex min-w-0 items-center gap-4">
       <img
         :src="item.image"
         :alt="item.title"
-        class="h-16 w-16 shrink-0 object-cover"
+        class="h-20 w-20 shrink-0 rounded-md object-cover"
       />
-      <h3 class="min-w-0 text-sm font-medium text-gray-900 md:text-base">
+      <h3 class="min-w-0 text-base font-medium leading-snug text-gray-900">
         {{ item.title }}
       </h3>
     </div>
-    <p class="tabular-nums text-gray-900">{{ formatMoney(item.price) }}</p>
+    <p class="text-base font-medium tabular-nums text-gray-900">
+      {{ formatMoney(item.price) }}
+    </p>
     <QuantitySelector
+      class="self-center md:self-auto"
       :quantity="item.quantity"
       @update:quantity="updateItemQuantity(item.id, $event)"
     />
-    <p class="tabular-nums text-gray-900">
+    <p class="text-base font-medium tabular-nums text-gray-900 md:text-right">
       {{ formatMoney(item.price * item.quantity) }}
     </p>
   </article>

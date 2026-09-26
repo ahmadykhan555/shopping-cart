@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Notivue, Notification } from "notivue";
-import AppHeader from "./components/AppHeader.vue";
+import AppHeader from "./components/base/AppHeader.vue";
 </script>
 
 <template>

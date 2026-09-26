@@ -9,6 +9,7 @@ import {
 import useApi from "./useApi";
 import { createDummyCartItem } from "@/utils/cart";
 import { useToast } from "./useToast";
+import useShippingCost from "./useCalculateShippingCost";
 
 // data
 const cartItems = ref<CartItem[]>([]); // allows state sharing

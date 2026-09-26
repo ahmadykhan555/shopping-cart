@@ -1,20 +1,15 @@
 <template>
-  <div class="mt-12 flex justify-between">
-    <button
-      class="bg-green-500 text-white px-4 py-2 rounded-md mr-4"
-      @click="$emit('addItem')"
-    >
+  <div class="mt-8 flex flex-wrap justify-between gap-4">
+    <AppButton variant="secondary" @click="$emit('addItem')">
       Add item
-    </button>
-    <button
-      class="bg-blue-500 text-white px-4 py-2 rounded-md"
-      @click="$emit('clearCart')"
-    >
+    </AppButton>
+    <AppButton variant="danger" @click="$emit('clearCart')">
       Clear Cart
-    </button>
+    </AppButton>
   </div>
 </template>
 
 <script setup lang="ts">
+import AppButton from "../base/AppButton.vue";
 defineEmits(["addItem", "clearCart"]);
 </script>
