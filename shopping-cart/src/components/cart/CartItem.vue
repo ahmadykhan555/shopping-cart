@@ -8,19 +8,24 @@
         :alt="item.title"
         class="h-20 w-20 shrink-0 rounded-md object-cover"
       />
-      <h3 class="min-w-0 text-base font-medium leading-snug text-gray-900">
-        {{ item.title }}
-      </h3>
+      <div>
+        <h3 class="min-w-0 text-base font-medium leading-snug text-gray-900">
+          {{ item.title }}
+        </h3>
+        <p class="mt-1 text-sm text-gray-500 line-clamp-2">
+          {{ item.description }}
+        </p>
+      </div>
     </div>
     <p class="text-base font-medium tabular-nums text-gray-900">
       {{ formatMoney(item.price) }}
     </p>
     <QuantitySelector
-      class="self-center md:self-auto"
+      class="justify-self-start self-center"
       :quantity="item.quantity"
       @update:quantity="updateItemQuantity(item.id, $event)"
     />
-    <p class="text-base font-medium tabular-nums text-gray-900 md:text-right">
+    <p class="text-right text-base font-medium tabular-nums text-gray-900">
       {{ formatMoney(item.price * item.quantity) }}
     </p>
   </article>

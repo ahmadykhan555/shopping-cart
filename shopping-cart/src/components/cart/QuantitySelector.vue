@@ -1,6 +1,6 @@
 <template>
   <div
-    class="inline-flex h-9 w-30 shrink-0 items-center self-start overflow-hidden rounded-md bg-gray-100"
+    class="inline-flex h-9 w-30 shrink-0 items-center overflow-hidden rounded-md bg-gray-100"
   >
     <button
       @click="selectedQuantity > minQuantity && selectedQuantity--"

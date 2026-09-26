@@ -18,7 +18,7 @@
       Quantity
     </div>
     <div
-      class="pb-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500 md:text-left"
+      class="pb-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500"
     >
       Total
     </div>
