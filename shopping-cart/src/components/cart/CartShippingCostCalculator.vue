@@ -4,12 +4,18 @@
       type="button"
       variant="ghost"
       class="flex w-full items-center justify-between gap-2 text-left text-gray-900"
-      :aria-expanded="!isCollapsed"
+      :aria-expanded="collapsible ? !isCollapsed : true"
       aria-controls="shipping-calculator-panel"
       @click="toggleCollapsed"
     >
-      <span>Calculate Shipping</span>
-      <span class="text-sm font-normal text-gray-500" aria-hidden="true">
+      <span :class="collapsible ? 'text-lg font-semibold' : 'font-normal'">
+        Calculate Shipping
+      </span>
+      <span
+        v-if="collapsible"
+        class="text-sm font-normal text-gray-500"
+        aria-hidden="true"
+      >
         {{ isCollapsed ? "Show" : "Hide" }}
       </span>
     </AppButton>
@@ -24,7 +30,11 @@
       </span>
     </div>
 
-    <div v-show="!isCollapsed" id="shipping-calculator-panel" class="mt-5">
+    <div
+      v-show="!collapsible || !isCollapsed"
+      id="shipping-calculator-panel"
+      class="mt-5"
+    >
       <form class="flex flex-col gap-4" @submit.prevent>
         <input
           v-for="field in calculatorFields"
@@ -71,8 +81,19 @@ const form = reactive<ShippingForm>({
   postalCode: "",
 });
 
+const props = withDefaults(
+  defineProps<{
+    collapsible?: boolean;
+    initialCollapsed?: boolean;
+  }>(),
+  {
+    collapsible: false,
+    initialCollapsed: true,
+  },
+);
+
 const { calculateShippingCost, shippingCost } = useCalculateShippingCost();
-const isCollapsed = ref(false);
+const isCollapsed = ref(props.initialCollapsed);
 
 const isDisabled = computed(
   () =>
@@ -80,6 +101,9 @@ const isDisabled = computed(
 );
 
 const toggleCollapsed = () => {
+  if (!props.collapsible) {
+    return;
+  }
   isCollapsed.value = !isCollapsed.value;
 };
 

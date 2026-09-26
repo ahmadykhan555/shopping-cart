@@ -18,9 +18,20 @@
 
     <div
       v-else
-      class="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-16"
+      class="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-16"
     >
-      <div class="min-w-0 flex-1">
+      <aside
+        class="order-first w-full shrink-0 lg:order-2 lg:sticky lg:top-24 lg:w-80 xl:w-96"
+      >
+        <CartSummary collapsible :initial-collapsed="false" />
+        <CartShippingCostCalculator
+          class="mt-4 lg:mt-6"
+          collapsible
+          initial-collapsed
+        />
+      </aside>
+
+      <div class="order-2 min-w-0 flex-1 lg:order-1">
         <div
           v-if="cartItems.length"
           class="relative max-h-[calc(100vh-20rem)] w-full min-w-0"
@@ -56,11 +67,6 @@
           />
         </template>
       </div>
-
-      <aside class="w-full shrink-0 lg:sticky lg:top-24 lg:w-80 xl:w-96">
-        <CartSummary />
-        <CartShippingCostCalculator />
-      </aside>
     </div>
   </div>
 </template>
