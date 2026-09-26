@@ -7,7 +7,7 @@ export default function useTotalWithShippingCost() {
   const { shippingCost } = useCalculateShippingCost();
 
   return {
-    totalWithoutShippingCost: computed(() => summary.value.total),
+    totalWithoutShippingCost: computed(() => summary.value.totalWithTax),
     totalWithShippingCost: computed(
       () => summary.value.totalWithTax + shippingCost.value,
     ),

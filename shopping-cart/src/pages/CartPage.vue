@@ -30,12 +30,13 @@
         >
           <CartItemsColumnHeaders />
           <CartItem
-            v-for="(item, idx) in cartItems"
-            :key="idx"
+            v-for="item in cartItems"
+            :key="item.id"
             :item="item"
             :updateItemQuantity="
               (id, quantity) => updateItemQuantity(id, quantity)
             "
+            @remove="removeItemFromCart"
           />
         </div>
         <CartActions @addItem="addItemToCart" @clearCart="clearCart" />
@@ -65,6 +66,7 @@ const {
   addItemToCart,
   clearCart,
   updateItemQuantity,
+  removeItemFromCart,
 } = useCart();
 
 onMounted(() => {
