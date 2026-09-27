@@ -1,20 +1,28 @@
 <template>
-  <div class="mt-12 flex justify-between">
-    <button
-      class="bg-green-500 text-white px-4 py-2 rounded-md mr-4"
+  <div class="flex flex-wrap justify-between gap-4 px-4 py-4">
+    <AppButton
+      variant="secondary"
+      aria-label="Add item to cart"
       @click="$emit('addItem')"
     >
       Add item
-    </button>
-    <button
-      class="bg-blue-500 text-white px-4 py-2 rounded-md"
+    </AppButton>
+    <AppButton
+      aria-label="Clear cart"
+      :disabled="cartItems.length === 0"
+      variant="danger"
       @click="$emit('clearCart')"
     >
       Clear Cart
-    </button>
+    </AppButton>
   </div>
 </template>
 
 <script setup lang="ts">
+import useCart from "@/composables/useCart";
+import AppButton from "../base/AppButton.vue";
+
 defineEmits(["addItem", "clearCart"]);
+
+const { cartItems } = useCart();
 </script>

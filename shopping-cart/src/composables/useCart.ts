@@ -4,69 +4,79 @@ import {
   STANDARD_TAX_RATE,
   FETCH_CART_ITEMS_URL,
   ADD_ITEM_TO_CART_URL,
-  FETCH_ITEM_BY_ID_URL,
   MAX_CART_ITEMS,
 } from "@/consts";
 import useApi from "./useApi";
+import { createDummyCartItem } from "@/utils/cart";
+import { useToast } from "./useToast";
+import useShippingCost from "./useCalculateShippingCost";
+
+// data
+const cartItems = ref<CartItem[]>([]); // allows state sharing
+const isFetching = ref(false);
+const summary = computed<CartSummary>(() => {
+  const total = cartItems.value.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0,
+  );
+  const tax = total * STANDARD_TAX_RATE;
+  return {
+    total: Number(total.toFixed(2)),
+    tax: Number(tax.toFixed(2)),
+    count: cartItems.value.length,
+    shippingCost: 0,
+    totalWithTax: Number((total + tax).toFixed(2)),
+  };
+});
 
 export default function useCart() {
   const { apiCall } = useApi();
-  // data
-  const cartItems = ref<CartItem[]>([]);
-  const isFetching = ref(false);
-  const summary = computed<CartSummary>(() => {
-    const total = cartItems.value.reduce(
-      (acc, item) => acc + item.price * item.quantity,
-      0,
-    );
-    const tax = total * STANDARD_TAX_RATE;
-    return {
-      total: Number(total.toFixed(2)),
-      tax: Number(tax.toFixed(2)),
-      count: cartItems.value.length,
-      shippingCost: 0,
-      totalWithTax: Number((total + tax).toFixed(2)),
-    };
-  });
+  const { success } = useToast();
 
   // methods
   const fetchCartItems = async () => {
     isFetching.value = true;
-    const rawCartItems = await apiCall<CartItem[]>(FETCH_CART_ITEMS_URL, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
+    await apiCall<CartItem[]>(
+      FETCH_CART_ITEMS_URL,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    });
-    cartItems.value = rawCartItems
-      .slice(0, MAX_CART_ITEMS)
-      .map((item: any) => ({
-        id: item.id,
-        title: item.title,
-        price: item.price,
-        description: item.description,
-        category: item.category,
-        image: item.image,
-        quantity: item.quantity ?? 1,
-      }));
+      (rawCartItems) => {
+        cartItems.value = rawCartItems.slice(0, MAX_CART_ITEMS).map((item) => ({
+          id: item.id,
+          title: item.title,
+          price: item.price,
+          description: item.description,
+          category: item.category,
+          image: item.image,
+          quantity: item.quantity ?? 1,
+        }));
+      },
+    );
     isFetching.value = false;
   };
 
-  const addItemToCart = async (item: CartItem) => {
-    const response = await apiCall<{ id: number }>(ADD_ITEM_TO_CART_URL, {
-      method: "POST",
-      body: JSON.stringify(item),
-    });
+  const addItemToCart = async () => {
+    const newItem = createDummyCartItem(Date.now());
 
-    if (response.id) {
-      const addedItem = await apiCall<CartItem>(
-        FETCH_ITEM_BY_ID_URL(response.id),
-      );
-
-      if (addedItem) {
-        cartItems.value.push(addedItem);
-      }
-    }
+    await apiCall(
+      ADD_ITEM_TO_CART_URL,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: newItem.title,
+          price: newItem.price,
+        }),
+      },
+      () => {
+        cartItems.value.push(newItem);
+        success(`"${newItem.title}" added to cart`);
+      },
+    );
   };
 
   const removeItemFromCart = async (id: number) => {

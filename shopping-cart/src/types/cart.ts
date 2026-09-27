@@ -15,3 +15,11 @@ export type CartSummary = {
   shippingCost: number;
   totalWithTax: number;
 };
+
+export type CheckoutOrderSummary = {
+  itemCount: number;
+  subtotal: number;
+  shipping: number;
+  tax: number;
+  total: number;
+};
