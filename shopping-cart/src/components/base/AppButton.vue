@@ -1,5 +1,5 @@
 <template>
-  <button :disabled="disabled" :class="buttonClasses">
+  <button :disabled="disabled" :class="buttonClasses" :aria-label="ariaLabel">
     <slot />
   </button>
 </template>
@@ -11,9 +11,11 @@ const props = withDefaults(
   defineProps<{
     variant?: "primary" | "secondary" | "danger" | "ghost" | "link";
     disabled?: boolean;
+    ariaLabel?: string;
   }>(),
   {
     variant: "primary",
+    ariaLabel: "button",
   },
 );
 

@@ -2,6 +2,7 @@
   <div class="mt-6 rounded-xl border border-gray-200 bg-gray-50/50 p-6">
     <AppButton
       type="button"
+      aria-label="Toggle shipping calculator"
       variant="ghost"
       class="flex w-full items-center justify-between gap-2 text-left text-gray-900"
       :aria-expanded="collapsible ? !isCollapsed : true"
@@ -35,24 +36,51 @@
       id="shipping-calculator-panel"
       class="mt-5"
     >
-      <form class="flex flex-col gap-4" @submit.prevent>
-        <input
+      <form
+        class="flex flex-col gap-4"
+        novalidate
+        @submit.prevent="handleCalculateShipping"
+      >
+        <div
           v-for="field in calculatorFields"
           :key="field.key"
-          v-model="form[field.key]"
-          :type="field.type"
-          :inputmode="field.inputmode"
-          :placeholder="field.placeholder"
-          :aria-label="field.label"
-          class="w-full border-0 border-b border-gray-300 bg-transparent py-2 text-base text-gray-900 placeholder:text-gray-400 focus:border-gray-600 focus:outline-none"
-        />
+          class="flex flex-col gap-1"
+        >
+          <input
+            :id="`shipping-${field.key}`"
+            v-model="form[field.key]"
+            :type="field.type"
+            :inputmode="field.inputmode"
+            :placeholder="field.placeholder"
+            :aria-label="field.label"
+            :aria-invalid="errors[field.key] ? true : undefined"
+            :aria-describedby="
+              errors[field.key] ? `shipping-${field.key}-error` : undefined
+            "
+            class="w-full border-0 border-b bg-transparent py-2 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none"
+            :class="
+              errors[field.key]
+                ? 'border-red-500 focus:border-red-600'
+                : 'border-gray-300 focus:border-gray-600'
+            "
+            @blur="markTouched(field.key)"
+          />
+          <p
+            v-if="errors[field.key]"
+            :id="`shipping-${field.key}-error`"
+            class="text-sm text-red-600"
+            role="alert"
+          >
+            {{ errors[field.key] }}
+          </p>
+        </div>
 
         <AppButton
-          :disabled="isDisabled"
-          type="button"
+          type="submit"
           class="mt-2 w-full py-3"
+          aria-label="Calculate shipping"
           variant="secondary"
-          @click="handleCalculateShipping"
+          :disabled="!isValid"
         >
           Calculate Shipping
         </AppButton>
@@ -62,9 +90,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { reactive, ref } from "vue";
 import AppButton from "../base/AppButton.vue";
 import useCalculateShippingCost from "@/composables/useCalculateShippingCost";
+import useFormValidation, {
+  type FormFieldRules,
+} from "@/composables/useFormValidation";
 import { formatMoney } from "@/utils";
 
 type ShippingForm = {
@@ -74,12 +105,6 @@ type ShippingForm = {
 };
 
 type FieldKey = keyof ShippingForm;
-
-const form = reactive<ShippingForm>({
-  origin: "",
-  destination: "",
-  postalCode: "",
-});
 
 const props = withDefaults(
   defineProps<{
@@ -92,20 +117,11 @@ const props = withDefaults(
   },
 );
 
-const { calculateShippingCost, shippingCost } = useCalculateShippingCost();
-const isCollapsed = ref(props.initialCollapsed);
-
-const isDisabled = computed(
-  () =>
-    !form.origin.trim() || !form.destination.trim() || !form.postalCode.trim(),
-);
-
-const toggleCollapsed = () => {
-  if (!props.collapsible) {
-    return;
-  }
-  isCollapsed.value = !isCollapsed.value;
-};
+const form = reactive<ShippingForm>({
+  origin: "Stuttgart",
+  destination: "",
+  postalCode: "",
+});
 
 const calculatorFields: {
   key: FieldKey;
@@ -135,7 +151,48 @@ const calculatorFields: {
   },
 ];
 
+const fieldRules: FormFieldRules<ShippingForm> = {
+  origin: {
+    label: "Origin",
+    required: true,
+    validateField: (value) =>
+      value.length < 2 ? "Must be at least 2 characters" : null,
+  },
+  destination: {
+    label: "Destination",
+    required: true,
+    validateField: (value) =>
+      value.length < 2 ? "Must be at least 2 characters" : null,
+  },
+  postalCode: {
+    label: "Postal code",
+    required: true,
+    validateField: (value) =>
+      /^[a-zA-Z0-9\s-]{3,12}$/.test(value)
+        ? null
+        : "Enter a valid postal code (3–12 characters)",
+  },
+};
+
+const { errors, markTouched, validateForm, isValid } = useFormValidation(
+  form,
+  fieldRules,
+);
+
+const { calculateShippingCost, shippingCost } = useCalculateShippingCost();
+const isCollapsed = ref(props.initialCollapsed);
+
+const toggleCollapsed = () => {
+  if (!props.collapsible) {
+    return;
+  }
+  isCollapsed.value = !isCollapsed.value;
+};
+
 const handleCalculateShipping = () => {
+  if (!validateForm()) {
+    return;
+  }
   calculateShippingCost();
 };
 </script>

@@ -1,6 +1,7 @@
 <template>
   <div class="rounded-xl border border-gray-200 bg-gray-50/50 p-6">
     <AppButton
+      aria-label="Toggle order summary"
       v-if="collapsible"
       type="button"
       variant="ghost"
@@ -37,10 +38,11 @@
       <AppButton
         class="mt-2 w-full py-3"
         variant="secondary"
+        aria-label="Proceed to checkout"
         :disabled="isCheckoutDisabled"
         @click="handleCheckout"
       >
-        Checkout
+        Proceed To Checkout
       </AppButton>
     </div>
   </div>

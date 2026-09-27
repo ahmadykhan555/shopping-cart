@@ -1,9 +1,14 @@
 <template>
   <div class="flex flex-wrap justify-between gap-4 px-4 py-4">
-    <AppButton variant="secondary" @click="$emit('addItem')">
+    <AppButton
+      variant="secondary"
+      aria-label="Add item to cart"
+      @click="$emit('addItem')"
+    >
       Add item
     </AppButton>
     <AppButton
+      aria-label="Clear cart"
       :disabled="cartItems.length === 0"
       variant="danger"
       @click="$emit('clearCart')"
