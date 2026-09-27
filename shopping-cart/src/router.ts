@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from "vue-router";
 
-import HomePage from "./pages/HomePage.vue";
 import CartPage from "./pages/CartPage.vue";
 import CheckoutSuccessPage from "./pages/CheckoutSuccessPage.vue";
+import HomePage from "./pages/home/HomePage.vue";
 
 export default createRouter({
   history: createWebHistory(),
