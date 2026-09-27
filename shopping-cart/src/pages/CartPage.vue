@@ -51,7 +51,7 @@
             />
           </div>
           <CartActions
-            class="absolute inset-x-0 bottom-0 z-10 border-t border-gray-200/80 bg-white/75 backdrop-blur-md"
+            class="absolute inset-x-0 bottom-0 z-10 bg-white/75 backdrop-blur-md"
             @addItem="addItemToCart"
             @clearCart="clearCart"
           />
