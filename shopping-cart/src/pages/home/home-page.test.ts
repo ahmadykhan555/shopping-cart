@@ -1,12 +1,38 @@
-import { describe, it, expect, afterAll, afterEach } from "vitest";
+import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/vue";
 import { userEvent } from "@testing-library/user-event";
 import HomePage from "./HomePage.vue";
 import router from "@/router";
-import useCart from "@/composables/useCart.js";
-import { createDummyCartItem } from "@/utils/cart.js";
+import useCart from "@/composables/useCart";
+
+vi.mock("@/composables/useToast", () => ({
+  useToast: () => ({
+    success: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+  }),
+}));
+
+beforeEach(() => {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({}),
+    }),
+  );
+  useCart().clearCart();
+});
+
+afterEach(() => {
+  cleanup();
+  vi.unstubAllGlobals();
+});
 
 const renderHomeWithRouter = async () => {
+  await router.push("/");
+  await router.isReady();
+
   return await render(HomePage, {
     global: {
       plugins: [router],
@@ -14,11 +40,9 @@ const renderHomeWithRouter = async () => {
   });
 };
 
-afterEach(() => cleanup());
-
 describe("Homepage", () => {
   it("renders homepage correctly", async () => {
-    await render(HomePage);
+    await renderHomeWithRouter();
     const homePageTitle = screen.getByTestId("home-page-title");
     expect(homePageTitle).toHaveTextContent("Home");
   });
@@ -36,13 +60,12 @@ describe("Homepage", () => {
     const emptyCartMessage = screen.getByTestId("empty-cart-message");
     expect(emptyCartMessage).toBeInTheDocument();
   });
+
   it("shows correct count when cart is loaded", async () => {
-    const { cartItems } = useCart();
-    cartItems.value = [
-      createDummyCartItem(1),
-      createDummyCartItem(2),
-      createDummyCartItem(3),
-    ];
+    const { addItemToCart } = useCart();
+    await addItemToCart(1);
+    await addItemToCart(2);
+    await addItemToCart(3);
     await renderHomeWithRouter();
     const cartItemsCount = screen.getByTestId("cart-items-count");
     expect(cartItemsCount).toBeInTheDocument();

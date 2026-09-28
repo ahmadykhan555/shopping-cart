@@ -1,4 +1,4 @@
-import { ref } from "vue";
+import { readonly, ref } from "vue";
 
 const shippingCost = ref(0);
 export default function useCalculateShippingCost() {
@@ -12,6 +12,6 @@ export default function useCalculateShippingCost() {
 
   return {
     calculateShippingCost,
-    shippingCost,
+    shippingCost: readonly(shippingCost),
   };
 }

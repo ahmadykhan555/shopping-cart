@@ -1,4 +1,4 @@
-import { computed, ref } from "vue";
+import { computed, readonly, ref } from "vue";
 import type { CartItem, CartSummary } from "@/types";
 import {
   STANDARD_TAX_RATE,
@@ -9,7 +9,6 @@ import {
 import useApi from "./useApi";
 import { createDummyCartItem } from "@/utils/cart";
 import { useToast } from "./useToast";
-import useShippingCost from "./useCalculateShippingCost";
 
 // data
 const cartItems = ref<CartItem[]>([]); // allows state sharing
@@ -59,8 +58,8 @@ export default function useCart() {
     isFetching.value = false;
   };
 
-  const addItemToCart = async () => {
-    const newItem = createDummyCartItem(Date.now());
+  const addItemToCart = async (id?: number) => {
+    const newItem = createDummyCartItem(id ?? Date.now());
 
     await apiCall(
       ADD_ITEM_TO_CART_URL,
@@ -92,8 +91,8 @@ export default function useCart() {
   };
 
   return {
-    summary,
-    cartItems,
+    summary: readonly(summary),
+    cartItems: readonly(cartItems),
     isFetching,
     fetchCartItems,
     addItemToCart,

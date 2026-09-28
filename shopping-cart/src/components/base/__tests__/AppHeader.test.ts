@@ -31,12 +31,10 @@ describe("AppHeader", () => {
   });
 
   it("displays the cart count when there are items in the cart", async () => {
-    const { cartItems } = useCart();
-    cartItems.value = [
-      createDummyCartItem(1),
-      createDummyCartItem(2),
-      createDummyCartItem(3),
-    ];
+    const { addItemToCart } = useCart();
+    await addItemToCart(1);
+    await addItemToCart(2);
+    await addItemToCart(3);
     await renderWithRouter(AppHeader);
     const cartLink = screen.getByRole("link", { name: /cart/i });
     expect(cartLink).toBeInTheDocument();
