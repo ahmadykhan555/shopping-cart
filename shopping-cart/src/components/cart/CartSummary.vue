@@ -20,6 +20,16 @@
     </h2>
 
     <div
+      v-if="collapsible && isCollapsed"
+      class="mt-3 flex items-center justify-between border-t border-gray-200 pt-3"
+    >
+      <span class="text-sm text-gray-600">Total</span>
+      <span class="text-base font-semibold tabular-nums text-gray-900">
+        {{ formatMoney(orderTotal) }}
+      </span>
+    </div>
+
+    <div
       v-show="!collapsible || !isCollapsed"
       id="cart-summary-panel"
       :class="collapsible ? 'mt-5' : ''"
@@ -79,6 +89,12 @@ const { isFetching, summary, cartItems, clearCart } = useCart();
 const { totalWithoutShippingCost, totalWithShippingCost, shippingCost } =
   useTotalWithShippingCost();
 
+const orderTotal = computed(() =>
+  shippingCost.value
+    ? totalWithShippingCost.value
+    : totalWithoutShippingCost.value,
+);
+
 const summaryItems = computed(() => [
   {
     label: "Subtotal",
@@ -94,11 +110,7 @@ const summaryItems = computed(() => [
   },
   {
     label: "Total",
-    value: formatMoney(
-      shippingCost.value
-        ? totalWithShippingCost.value
-        : totalWithoutShippingCost.value,
-    ),
+    value: formatMoney(orderTotal.value),
   },
 ]);
 
@@ -107,10 +119,6 @@ const handleCheckout = () => {
   if (itemCount < 1) {
     return;
   }
-
-  const total = shippingCost.value
-    ? totalWithShippingCost.value
-    : totalWithoutShippingCost.value;
 
   void router.push({
     path: "/checkout/success",
@@ -121,7 +129,7 @@ const handleCheckout = () => {
         subtotal: summary.value.total,
         shipping: shippingCost.value,
         tax: summary.value.tax,
-        total,
+        total: orderTotal.value,
       },
     },
   });
