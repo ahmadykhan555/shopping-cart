@@ -4,7 +4,6 @@ import AppHeader from "../AppHeader.vue";
 import { renderWithRouter } from "@/test/utils.ts";
 import userEvent from "@testing-library/user-event";
 import useCart from "@/composables/useCart.ts";
-import { createDummyCartItem } from "@/utils/cart.ts";
 
 afterEach(() => cleanup());
 describe("AppHeader", () => {
