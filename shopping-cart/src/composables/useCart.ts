@@ -23,7 +23,6 @@ const summary = computed<CartSummary>(() => {
     total: Number(total.toFixed(2)),
     tax: Number(tax.toFixed(2)),
     count: cartItems.value.length,
-    shippingCost: 0,
     totalWithTax: Number((total + tax).toFixed(2)),
   };
 });

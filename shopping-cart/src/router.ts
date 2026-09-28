@@ -1,14 +1,23 @@
 import { createRouter, createWebHistory } from "vue-router";
 
-import CartPage from "./pages/CartPage.vue";
-import CheckoutSuccessPage from "./pages/CheckoutSuccessPage.vue";
-import HomePage from "./pages/home/HomePage.vue";
-
 export default createRouter({
   history: createWebHistory(),
   routes: [
-    { path: "/", component: HomePage },
-    { path: "/cart", component: CartPage },
-    { path: "/checkout/success", component: CheckoutSuccessPage },
+    {
+      name: "home",
+      path: "/",
+      component: () => import("./pages/home/HomePage.vue"),
+    },
+    {
+      name: "cart",
+      path: "/cart",
+      component: () => import("./pages/CartPage.vue"),
+    },
+    {
+      name: "checkout-success",
+      path: "/checkout/success",
+      component: () => import("./pages/CheckoutSuccessPage.vue"),
+    },
+    // todo add catch all for 404
   ],
 });

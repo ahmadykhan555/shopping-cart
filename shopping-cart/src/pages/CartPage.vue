@@ -44,10 +44,8 @@
               v-for="item in cartItems"
               :key="item.id"
               :item="item"
-              :updateItemQuantity="
-                (id, quantity) => updateItemQuantity(id, quantity)
-              "
-              @remove="removeItemFromCart"
+              @click:updateItemQuantity="updateItemQuantity"
+              @click:removeItem="removeItemFromCart"
             />
           </div>
           <CartActions

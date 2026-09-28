@@ -3,14 +3,14 @@
     <RouterLink
       class="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
       active-class="!font-semibold !text-gray-900"
-      to="/"
+      :to="{ name: 'home' }"
     >
       Home
     </RouterLink>
     <RouterLink
       class="relative flex items-center gap-2 text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
       active-class="!font-semibold !text-gray-900"
-      to="/cart"
+      :to="{ name: 'cart' }"
     >
       <span
         v-if="cartItems.length"

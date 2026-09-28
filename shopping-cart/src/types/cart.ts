@@ -12,7 +12,7 @@ export type CartSummary = {
   total: number;
   tax: number;
   count: number;
-  shippingCost: number;
+
   totalWithTax: number;
 };
 

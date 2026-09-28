@@ -13,7 +13,7 @@
           type="button"
           class="absolute right-0 top-0 flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-gray-100/90 text-gray-600 shadow-sm ring-1 ring-gray-200/80 backdrop-blur-sm transition-colors hover:bg-red-600 hover:text-white hover:ring-red-600/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-red-500"
           :aria-label="`Remove ${item.title} from cart`"
-          @click="emit('remove', item.id)"
+          @click="emit('click:removeItem', item.id)"
         >
           <XIcon class="size-2.5 stroke-[2.5]" />
         </button>
@@ -33,7 +33,7 @@
     <QuantitySelector
       class="justify-self-start self-center"
       :quantity="item.quantity"
-      @update:quantity="updateItemQuantity(item.id, $event)"
+      @update:quantity="emit('click:updateItemQuantity', item.id, $event)"
     />
     <p class="text-right text-base font-medium tabular-nums text-gray-900">
       {{ formatMoney(item.price * item.quantity) }}
@@ -48,10 +48,10 @@ import QuantitySelector from "./QuantitySelector.vue";
 
 defineProps<{
   item: CartItem;
-  updateItemQuantity: (id: number, quantity: number) => void;
 }>();
 
 const emit = defineEmits<{
-  remove: [id: number];
+  "click:removeItem": [id: number];
+  "click:updateItemQuantity": [id: number, quantity: number];
 }>();
 </script>
