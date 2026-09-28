@@ -55,10 +55,12 @@ describe("useApi composable", () => {
     const mockFetchRejected = vi.fn().mockRejectedValue(new Error("API error"));
     vi.stubGlobal("fetch", mockFetchRejected);
     const onSuccessCallback = vi.fn();
-    await apiCall({
-      url: "https://api.example.com",
-      onSuccess: onSuccessCallback,
-    });
+    await expect(
+      apiCall({
+        url: "https://api.example.com",
+        onSuccess: onSuccessCallback,
+      }),
+    ).rejects.toThrow("Something went wrong. Please try again.");
     expect(mockFetchRejected).toHaveBeenCalledTimes(1);
     expect(mockToastError).toHaveBeenCalledTimes(1);
     expect(mockToastError).toHaveBeenCalledWith(

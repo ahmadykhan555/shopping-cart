@@ -34,21 +34,23 @@ export default function useCart() {
   // methods
   const fetchCartItems = async () => {
     isFetching.value = true;
-    await apiCall<CartItem[]>({
-      url: FETCH_CART_ITEMS_URL,
-      onSuccess: (rawCartItems) => {
-        cartItems.value = rawCartItems.slice(0, MAX_CART_ITEMS).map((item) => ({
-          id: item.id,
-          title: item.title,
-          price: item.price,
-          description: item.description,
-          category: item.category,
-          image: item.image,
-          quantity: item.quantity ?? 1,
-        }));
-      },
-    });
-    isFetching.value = false;
+    try {
+      await apiCall<CartItem[]>({
+        url: FETCH_CART_ITEMS_URL,
+        onSuccess: (rawCartItems) => {
+          cartItems.value = rawCartItems
+            .slice(0, MAX_CART_ITEMS)
+            .map((item) => ({
+              ...item,
+              quantity: item.quantity ?? 1,
+            }));
+        },
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      isFetching.value = false;
+    }
   };
 
   const addItemToCart = async (id?: number) => {
@@ -71,13 +73,13 @@ export default function useCart() {
     });
   };
 
-  const removeItemFromCart = async (id: number) => {
+  const removeItemFromCart = (id: number) => {
     cartItems.value = cartItems.value.filter((item) => item.id !== id);
   };
 
   const clearCart = () => (cartItems.value = []);
 
-  const updateItemQuantity = async (id: number, quantity: number) => {
+  const updateItemQuantity = (id: number, quantity: number) => {
     cartItems.value = cartItems.value.map((item) =>
       item.id === id ? { ...item, quantity } : item,
     );
@@ -86,7 +88,7 @@ export default function useCart() {
   return {
     summary: readonly(summary),
     cartItems: readonly(cartItems),
-    isFetching,
+    isFetching: readonly(isFetching),
     fetchCartItems,
     addItemToCart,
     removeItemFromCart,
