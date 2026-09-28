@@ -6,7 +6,7 @@ export default createRouter({
     {
       name: "home",
       path: "/",
-      component: () => import("./pages/home/HomePage.vue"),
+      component: () => import("./pages/HomePage.vue"),
     },
     {
       name: "cart",

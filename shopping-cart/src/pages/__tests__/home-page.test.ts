@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
-import { cleanup, render, screen } from "@testing-library/vue";
+import { cleanup, render, screen, waitFor } from "@testing-library/vue";
 import { userEvent } from "@testing-library/user-event";
-import HomePage from "./HomePage.vue";
+import HomePage from "../HomePage.vue";
 import router from "@/router";
 import useCart from "@/composables/useCart";
 
@@ -52,7 +52,9 @@ describe("Homepage", () => {
     const user = userEvent.setup();
     const cartLink = screen.getByRole("link", { name: "Go to cart" });
     await user.click(cartLink);
-    expect(router.currentRoute.value.path).toBe("/cart");
+    await waitFor(() => {
+      expect(router.currentRoute.value.path).toBe("/cart");
+    });
   });
 
   it("shows empty cart message when cart is empty and navigates to cart page when to cart link is clicked", async () => {

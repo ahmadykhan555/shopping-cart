@@ -34,15 +34,9 @@ export default function useCart() {
   // methods
   const fetchCartItems = async () => {
     isFetching.value = true;
-    await apiCall<CartItem[]>(
-      FETCH_CART_ITEMS_URL,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      },
-      (rawCartItems) => {
+    await apiCall<CartItem[]>({
+      url: FETCH_CART_ITEMS_URL,
+      onSuccess: (rawCartItems) => {
         cartItems.value = rawCartItems.slice(0, MAX_CART_ITEMS).map((item) => ({
           id: item.id,
           title: item.title,
@@ -53,16 +47,16 @@ export default function useCart() {
           quantity: item.quantity ?? 1,
         }));
       },
-    );
+    });
     isFetching.value = false;
   };
 
   const addItemToCart = async (id?: number) => {
     const newItem = createDummyCartItem(id ?? Date.now());
 
-    await apiCall(
-      ADD_ITEM_TO_CART_URL,
-      {
+    await apiCall<{ id: number }>({
+      url: ADD_ITEM_TO_CART_URL,
+      options: {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -70,11 +64,11 @@ export default function useCart() {
           price: newItem.price,
         }),
       },
-      () => {
+      onSuccess: () => {
         cartItems.value.push(newItem);
         success(`"${newItem.title}" added to cart`);
       },
-    );
+    });
   };
 
   const removeItemFromCart = async (id: number) => {
