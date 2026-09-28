@@ -44,16 +44,14 @@
 
 <script setup lang="ts">
 import CartSummaryItem from "@/components/cart/CartSummaryItem.vue";
-import type { CheckoutOrderSummary } from "@/types";
+import type {
+  CheckoutOrderSummary,
+  CheckoutSuccessHistoryState,
+} from "@/types";
 import { formatMoney } from "@/utils";
 import confetti from "canvas-confetti";
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-
-type CheckoutSuccessHistoryState = {
-  itemCount?: number;
-  orderSummary?: CheckoutOrderSummary;
-};
 
 const router = useRouter();
 const itemCount = ref(0);

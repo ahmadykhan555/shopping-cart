@@ -12,14 +12,5 @@ export type CartSummary = {
   total: number;
   tax: number;
   count: number;
-
   totalWithTax: number;
-};
-
-export type CheckoutOrderSummary = {
-  itemCount: number;
-  subtotal: number;
-  shipping: number;
-  tax: number;
-  total: number;
 };

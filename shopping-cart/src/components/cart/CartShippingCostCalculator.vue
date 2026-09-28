@@ -93,9 +93,8 @@
 import { reactive, ref } from "vue";
 import AppButton from "../base/AppButton.vue";
 import useCalculateShippingCost from "@/composables/useCalculateShippingCost";
-import useFormValidation, {
-  type FormFieldRules,
-} from "@/composables/useFormValidation";
+import useFormValidation from "@/composables/useFormValidation";
+import type { FormFieldRules } from "@/types";
 import { formatMoney } from "@/utils";
 
 type ShippingForm = {

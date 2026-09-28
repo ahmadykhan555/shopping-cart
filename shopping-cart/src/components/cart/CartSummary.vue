@@ -66,6 +66,7 @@ import useCart from "@/composables/useCart";
 import AppButton from "../base/AppButton.vue";
 import CartSummaryItem from "./CartSummaryItem.vue";
 import useTotalWithShippingCost from "@/composables/useTotalWithShippingCost";
+import type { CheckoutSuccessHistoryState } from "@/types";
 
 const props = withDefaults(
   defineProps<{
@@ -114,25 +115,28 @@ const summaryItems = computed(() => [
   },
 ]);
 
-const handleCheckout = () => {
+const handleCheckout = async () => {
   const itemCount = cartItems.value.length;
   if (itemCount < 1) {
     return;
   }
 
-  void router.push({
-    path: "/checkout/success",
-    state: {
+  const navigationState: CheckoutSuccessHistoryState = {
+    itemCount,
+    orderSummary: {
       itemCount,
-      orderSummary: {
-        itemCount,
-        subtotal: summary.value.total,
-        shipping: shippingCost.value,
-        tax: summary.value.tax,
-        total: orderTotal.value,
-      },
+      subtotal: summary.value.total,
+      shipping: shippingCost.value,
+      tax: summary.value.tax,
+      total: orderTotal.value,
     },
+  };
+
+  await router.push({
+    path: "/checkout/success",
+    state: navigationState,
   });
+
   clearCart();
 };
 
