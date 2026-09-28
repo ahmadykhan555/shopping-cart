@@ -2,10 +2,12 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import useApi from "../useApi";
 import { DEFAULT_API_OPTIONS } from "@/consts";
 
+const mockToastError = vi.fn();
+
 vi.mock("@/composables/useToast", () => ({
   useToast: () => ({
     success: vi.fn(),
-    error: vi.fn(),
+    error: mockToastError,
     info: vi.fn(),
   }),
 }));
@@ -45,5 +47,23 @@ describe("useApi composable", () => {
       title: "Test item",
     });
     expect(onSuccessCallback).toHaveBeenCalledTimes(1);
+    expect(mockToastError).not.toHaveBeenCalled();
+  });
+
+  it("show error message when API call fails", async () => {
+    const { apiCall } = useApi();
+    const mockFetchRejected = vi.fn().mockRejectedValue(new Error("API error"));
+    vi.stubGlobal("fetch", mockFetchRejected);
+    const onSuccessCallback = vi.fn();
+    await apiCall({
+      url: "https://api.example.com",
+      onSuccess: onSuccessCallback,
+    });
+    expect(mockFetchRejected).toHaveBeenCalledTimes(1);
+    expect(mockToastError).toHaveBeenCalledTimes(1);
+    expect(mockToastError).toHaveBeenCalledWith(
+      "Something went wrong. Please try again.",
+    );
+    expect(onSuccessCallback).not.toHaveBeenCalled();
   });
 });
