@@ -38,18 +38,17 @@ export default function useCart() {
     try {
       await apiCall<{ products: CartItem[] }>({
         url: FETCH_CART_ITEMS_URL,
+
         onSuccess: (rawResponse) => {
-          cartItems.value = rawResponse.products
-            .slice(0, MAX_CART_ITEMS)
-            .map((item) => ({
-              id: item.id,
-              title: item.title,
-              price: item.price,
-              description: item.description,
-              category: item.category,
-              images: item.images,
-              quantity: item.quantity ?? 1,
-            }));
+          cartItems.value = rawResponse.products.map((item) => ({
+            id: item.id,
+            title: item.title,
+            price: item.price,
+            description: item.description,
+            category: item.category,
+            images: item.images,
+            quantity: item.quantity ?? 1,
+          }));
         },
       });
     } catch (error) {

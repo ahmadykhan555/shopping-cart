@@ -1,5 +1,7 @@
 <template>
-  <div class="flex flex-wrap justify-between gap-4 px-4 py-4">
+  <div
+    class="flex flex-wrap justify-between gap-4 px-4 py-4 rounded-md shadow-sm"
+  >
     <AppButton
       variant="secondary"
       aria-label="Add item to cart"

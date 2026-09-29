@@ -82,7 +82,7 @@ describe("useCart composable", () => {
 
   // 2. cart items are fetched, limit respected, quantity is set to 1 as a fallback, sub total and total are calculated - no shipping cost
   it("cart state is correct after fetching cart items", async () => {
-    const { cartItems, summary } = await seedCart(20);
+    const { cartItems, summary } = await seedCart(MAX_CART_ITEMS);
     assertCartSize(cartItems, summary, MAX_CART_ITEMS);
     const totalWithoutTax = cartItems.value.reduce((acc, item) => {
       acc += item.price * item.quantity;
