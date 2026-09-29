@@ -3,6 +3,7 @@
     class="inline-flex h-9 w-30 shrink-0 items-center overflow-hidden rounded-md bg-gray-100"
   >
     <button
+      data-testid="decrement-quantity-button"
       @click="selectedQuantity > minQuantity && selectedQuantity--"
       class="flex h-full w-9 shrink-0 cursor-pointer items-center justify-center bg-transparent text-lg font-normal leading-none text-gray-500 transition-colors hover:bg-gray-200/80 active:bg-gray-200"
     >
@@ -17,6 +18,7 @@
       @input="$emit('update:quantity', sanitizeInput(selectedQuantity))"
     />
     <button
+      data-testid="increment-quantity-button"
       @click="selectedQuantity < maxQuantity && selectedQuantity++"
       class="flex h-full w-9 shrink-0 cursor-pointer items-center justify-center bg-transparent text-lg font-normal leading-none text-gray-500 transition-colors hover:bg-gray-200/80 active:bg-gray-200"
     >
@@ -26,6 +28,7 @@
 </template>
 <script setup lang="ts">
 import { ref, watch } from "vue";
+import { MIN_QUANTITY, MAX_QUANTITY } from "@/consts";
 
 const props = withDefaults(
   defineProps<{
@@ -34,11 +37,15 @@ const props = withDefaults(
     maxQuantity?: number;
   }>(),
   {
-    minQuantity: 1,
-    maxQuantity: 10,
     quantity: 1,
+    minQuantity: MIN_QUANTITY,
+    maxQuantity: MAX_QUANTITY,
   },
 );
+
+const emit = defineEmits<{
+  (e: "update:quantity", quantity: number): void;
+}>();
 
 const sanitizeInput = (value: number) => {
   if (value < props.minQuantity) {
@@ -50,11 +57,9 @@ const sanitizeInput = (value: number) => {
   return selectedQuantity.value;
 };
 
-const selectedQuantity = ref(props.quantity);
-
-const emit = defineEmits<{
-  (e: "update:quantity", quantity: number): void;
-}>();
+const selectedQuantity = ref(
+  props.quantity > 0 ? props.quantity : MIN_QUANTITY,
+);
 
 watch(selectedQuantity, () => {
   emit("update:quantity", selectedQuantity.value);

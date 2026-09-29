@@ -1,6 +1,6 @@
 import { cleanup, render, screen } from "@testing-library/vue";
 import { describe, it, expect, afterEach } from "vitest";
-import AppButton, { type ButtonProps } from "../AppButton.vue";
+import AppButton, { type ButtonProps } from "../base/AppButton.vue";
 import type { Component } from "vue";
 
 function renderButton(content: string | Component, props: ButtonProps) {

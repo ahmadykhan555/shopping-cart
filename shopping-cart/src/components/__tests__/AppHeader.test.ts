@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
 import { cleanup, screen, waitFor } from "@testing-library/vue";
-import AppHeader from "../AppHeader.vue";
+import AppHeader from "../base/AppHeader.vue";
 import { renderWithRouter } from "@/test/utils.ts";
 import userEvent from "@testing-library/user-event";
 import useCart from "@/composables/useCart.ts";
@@ -57,9 +57,9 @@ describe("AppHeader", () => {
 
   it("displays the cart count when there are items in the cart", async () => {
     const { addItemToCart } = useCart();
-    await addItemToCart(1);
-    await addItemToCart(2);
-    await addItemToCart(3);
+    await addItemToCart();
+    await addItemToCart();
+    await addItemToCart();
     await renderWithRouter(AppHeader);
     const cartLink = screen.getByRole("link", { name: /cart/i });
     expect(cartLink).toBeInTheDocument();

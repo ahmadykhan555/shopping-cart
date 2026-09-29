@@ -16,3 +16,6 @@ export const DUMMY_CART_ITEM_PAYLOAD: CartItem = {
 
 export const MIN_SHIPPING_COST = 5;
 export const MAX_SHIPPING_COST = 10;
+
+export const MIN_QUANTITY = 1;
+export const MAX_QUANTITY = 10;
