@@ -10,7 +10,7 @@ export const DUMMY_CART_ITEM_PAYLOAD: CartItem = {
   price: DUMMY_CART_ITEM_UNIT_PRICE,
   description: "lorem ipsum dolor sit amet",
   category: "Category",
-  image: "https://via.placeholder.com/150",
+  images: ["https://via.placeholder.com/150"],
   quantity: 1,
 };
 
