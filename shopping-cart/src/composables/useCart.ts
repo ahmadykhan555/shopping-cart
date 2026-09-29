@@ -58,22 +58,14 @@ export default function useCart() {
     }
   };
 
-  const addItemToCart = async () => {
-    const payload: Partial<CartItem> = {
-      title: `New Item ${cartItems.value.length + 1}`,
-      price: DUMMY_CART_ITEM_UNIT_PRICE,
-      description: `New Item Description ${cartItems.value.length + 1}`,
-      category: `Product`,
-      images: [`https://picsum.photos/seed/cart-item-${Math.random()}/150/150`],
-      quantity: 1,
-    };
-
+  const addItemToCart = async (item: Omit<CartItem, "id">) => {
+    debugger;
     await apiCall<CartItem>({
       url: ADD_ITEM_TO_CART_URL,
       options: {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...item, id: undefined }),
       },
       onSuccess: (item) => {
         cartItems.value.push({ ...item, quantity: item.quantity ?? 1 });

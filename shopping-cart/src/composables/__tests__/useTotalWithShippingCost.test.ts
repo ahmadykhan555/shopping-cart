@@ -32,9 +32,9 @@ describe("useTotalWithShippingCost", () => {
 
     const { addItemToCart } = useCart();
     // POST mock returns dummy items at price 10 → 3 items = 30 + tax
-    await addItemToCart();
-    await addItemToCart();
-    await addItemToCart();
+    await addItemToCart(createDummyCartItem(1));
+    await addItemToCart(createDummyCartItem(2));
+    await addItemToCart(createDummyCartItem(3));
 
     const expectedSubtotal = 3 * DUMMY_CART_ITEM_UNIT_PRICE;
     const expectedTotalWithTax = Number(

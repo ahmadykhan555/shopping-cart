@@ -100,7 +100,7 @@ describe("useCart composable", () => {
     assertCartSize(cartItems, summary, 5);
     assertSummaryFromSubtotal(summary, 5 * DUMMY_CART_ITEM_UNIT_PRICE);
 
-    await addItemToCart();
+    await addItemToCart(createDummyCartItem(1));
     assertCartSize(cartItems, summary, 6);
     assertSummaryFromSubtotal(summary, 6 * DUMMY_CART_ITEM_UNIT_PRICE);
   });

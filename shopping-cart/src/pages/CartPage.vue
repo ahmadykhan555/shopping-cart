@@ -50,7 +50,7 @@
           </div>
           <CartActions
             class="absolute inset-x-0 bottom-0 z-10 bg-white/75 backdrop-blur-md"
-            @addItem="addItemToCart"
+            @addItem="addItemToCart(createDummyCartItem(cartItems.length + 1))"
             @clearCart="clearCart"
           />
         </div>
@@ -60,7 +60,7 @@
           </p>
           <CartActions
             class="mt-8"
-            @addItem="addItemToCart"
+            @addItem="addItemToCart(createDummyCartItem(cartItems.length + 1))"
             @clearCart="clearCart"
           />
         </template>
@@ -77,6 +77,7 @@ import CartSummary from "@/components/cart/CartSummary.vue";
 import CartItemsColumnHeaders from "@/components/cart/CartItemsColumnHeaders.vue";
 import CartActions from "@/components/cart/CartActions.vue";
 import CartShippingCostCalculator from "@/components/cart/CartShippingCostCalculator.vue";
+import { createDummyCartItem } from "@/utils/cart.ts";
 
 const {
   cartItems,

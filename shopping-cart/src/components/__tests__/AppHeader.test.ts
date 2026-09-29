@@ -4,6 +4,7 @@ import AppHeader from "../base/AppHeader.vue";
 import { renderWithRouter } from "@/test/utils.ts";
 import userEvent from "@testing-library/user-event";
 import useCart from "@/composables/useCart.ts";
+import { createDummyCartItem } from "@/utils/cart.ts";
 
 vi.mock("@/composables/useToast", () => ({
   useToast: () => ({
@@ -57,9 +58,10 @@ describe("AppHeader", () => {
 
   it("displays the cart count when there are items in the cart", async () => {
     const { addItemToCart } = useCart();
-    await addItemToCart();
-    await addItemToCart();
-    await addItemToCart();
+    await addItemToCart(createDummyCartItem(1));
+    await addItemToCart(createDummyCartItem(2));
+    await addItemToCart(createDummyCartItem(3));
+
     await renderWithRouter(AppHeader);
     const cartLink = screen.getByRole("link", { name: /cart/i });
     expect(cartLink).toBeInTheDocument();

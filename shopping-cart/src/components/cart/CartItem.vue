@@ -45,9 +45,10 @@ import type { CartItem } from "@/types";
 import { formatMoney } from "@/utils";
 import XIcon from "@/assets/icons/XIcon.vue";
 import QuantitySelector from "./QuantitySelector.vue";
+import type { Ref } from "vue";
 
 defineProps<{
-  item: CartItem;
+  item: Readonly<CartItem>;
 }>();
 
 const emit = defineEmits<{

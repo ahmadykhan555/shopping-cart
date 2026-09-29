@@ -4,6 +4,7 @@ import { userEvent } from "@testing-library/user-event";
 import HomePage from "../HomePage.vue";
 import router from "@/router";
 import useCart from "@/composables/useCart";
+import { createDummyCartItem } from "@/utils/cart.ts";
 
 vi.mock("@/composables/useToast", () => ({
   useToast: () => ({
@@ -65,9 +66,9 @@ describe("Homepage", () => {
 
   it("shows correct count when cart is loaded", async () => {
     const { addItemToCart } = useCart();
-    await addItemToCart(1);
-    await addItemToCart(2);
-    await addItemToCart(3);
+    await addItemToCart(createDummyCartItem(1));
+    await addItemToCart(createDummyCartItem(2));
+    await addItemToCart(createDummyCartItem(3));
     await renderHomeWithRouter();
     const cartItemsCount = screen.getByTestId("cart-items-count");
     expect(cartItemsCount).toBeInTheDocument();
