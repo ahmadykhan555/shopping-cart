@@ -3,14 +3,19 @@ import useTotalWithShippingCost from "../useTotalWithShippingCost";
 import useCart from "../useCart";
 import useCalculateShippingCost from "../useCalculateShippingCost";
 import { STANDARD_TAX_RATE } from "@/consts";
+import { createDummyCartItem } from "@/utils/cart";
 
 beforeEach(() => {
   useCart().clearCart();
+  let addCount = 0;
   vi.stubGlobal(
     "fetch",
-    vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({}),
+    vi.fn().mockImplementation(() => {
+      addCount += 1;
+      return Promise.resolve({
+        ok: true,
+        json: async () => createDummyCartItem(addCount),
+      });
     }),
   );
 });
@@ -26,9 +31,10 @@ describe("useTotalWithShippingCost", () => {
     const expectedShipping = 5;
 
     const { addItemToCart } = useCart();
-    await addItemToCart(1); // indirectly calls createDummyCartItem where price is 100; so 3 items in cart = 300 + 20% tax
-    await addItemToCart(2);
-    await addItemToCart(3);
+    // POST mock returns dummy items at price 100 → 3 items = 300 + tax
+    await addItemToCart();
+    await addItemToCart();
+    await addItemToCart();
 
     const expectedSubtotal = 3 * 100;
     const expectedTotalWithTax = Number(

@@ -5,7 +5,7 @@
     <div class="flex min-w-0 items-center gap-4">
       <div class="relative shrink-0 pt-1.5 pr-1.5">
         <img
-          :src="item.image"
+          :src="item.images[0]"
           :alt="item.title"
           class="h-20 w-20 rounded-lg object-cover ring-1 ring-gray-200/80"
         />

@@ -7,16 +7,26 @@ import {
   MAX_CART_ITEMS,
   STANDARD_TAX_RATE,
 } from "@/consts";
-import type { CartItem, CartSummary } from "@/types";
+import type { CartSummary } from "@/types";
+
+type UseCartReturn = ReturnType<typeof useCart>;
 
 function mockFetchWithDummyItems(count: number) {
   vi.stubGlobal(
     "fetch",
-    vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () =>
-        Array.from({ length: count }, (_, i) => createDummyCartItem(i + 1)),
-    }),
+    vi.fn().mockImplementation((_url, init?: RequestInit) =>
+      Promise.resolve({
+        ok: true,
+        json: async () =>
+          init?.method?.toUpperCase() === "POST"
+            ? createDummyCartItem(count + 1)
+            : {
+                products: Array.from({ length: count }, (_, i) =>
+                  createDummyCartItem(i + 1),
+                ),
+              },
+      }),
+    ),
   );
 }
 
@@ -31,8 +41,8 @@ function assertSummaryFromSubtotal(
 }
 
 function assertCartSize(
-  cartItems: Readonly<Ref<readonly CartItem[]>>,
-  summary: Readonly<Ref<CartSummary>>,
+  cartItems: UseCartReturn["cartItems"],
+  summary: UseCartReturn["summary"],
   count: number,
 ) {
   expect(cartItems.value.length).toEqual(count);
@@ -90,7 +100,7 @@ describe("useCart composable", () => {
     assertCartSize(cartItems, summary, 5);
     assertSummaryFromSubtotal(summary, 5 * DUMMY_CART_ITEM_UNIT_PRICE);
 
-    await addItemToCart(6);
+    await addItemToCart();
     assertCartSize(cartItems, summary, 6);
     assertSummaryFromSubtotal(summary, 6 * DUMMY_CART_ITEM_UNIT_PRICE);
   });

@@ -6,7 +6,7 @@ export const createDummyCartItem = (id: number): CartItem => {
     price: 100,
     description: `lorem ipsum dolor sit amet ${id}`,
     category: `Category ${id}`,
-    image: `https://picsum.photos/seed/cart-item-${Math.random()}/150/150`,
+    images: [`https://picsum.photos/seed/cart-item-${Math.random()}/150/150`],
     quantity: 1,
     id,
   };

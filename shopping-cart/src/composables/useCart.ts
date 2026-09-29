@@ -35,13 +35,18 @@ export default function useCart() {
   const fetchCartItems = async () => {
     isFetching.value = true;
     try {
-      await apiCall<CartItem[]>({
+      await apiCall<{ products: CartItem[] }>({
         url: FETCH_CART_ITEMS_URL,
-        onSuccess: (rawCartItems) => {
-          cartItems.value = rawCartItems
+        onSuccess: (rawResponse) => {
+          cartItems.value = rawResponse.products
             .slice(0, MAX_CART_ITEMS)
             .map((item) => ({
-              ...item,
+              id: item.id,
+              title: item.title,
+              price: item.price,
+              description: item.description,
+              category: item.category,
+              images: item.images,
               quantity: item.quantity ?? 1,
             }));
         },
@@ -53,22 +58,26 @@ export default function useCart() {
     }
   };
 
-  const addItemToCart = async (id?: number) => {
-    const newItem = createDummyCartItem(id ?? Date.now());
+  const addItemToCart = async () => {
+    const payload: Partial<CartItem> = {
+      title: `New Item ${cartItems.value.length + 1}`,
+      price: 100,
+      description: `New Item Description ${cartItems.value.length + 1}`,
+      category: `Product`,
+      images: [`https://picsum.photos/seed/cart-item-${Math.random()}/150/150`],
+      quantity: 1,
+    };
 
-    await apiCall<{ id: number }>({
+    await apiCall<CartItem>({
       url: ADD_ITEM_TO_CART_URL,
       options: {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: newItem.title,
-          price: newItem.price,
-        }),
+        body: JSON.stringify(payload),
       },
-      onSuccess: () => {
-        cartItems.value.push(newItem);
-        success(`"${newItem.title}" added to cart`);
+      onSuccess: (item) => {
+        cartItems.value.push({ ...item, quantity: item.quantity ?? 1 });
+        success(`"${item.title}" added to cart`);
       },
     });
   };
