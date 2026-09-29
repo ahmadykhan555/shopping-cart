@@ -5,6 +5,7 @@ import {
   FETCH_CART_ITEMS_URL,
   ADD_ITEM_TO_CART_URL,
   MAX_CART_ITEMS,
+  DUMMY_CART_ITEM_UNIT_PRICE,
 } from "@/consts";
 import useApi from "./useApi";
 import { createDummyCartItem } from "@/utils/cart";
@@ -61,7 +62,7 @@ export default function useCart() {
   const addItemToCart = async () => {
     const payload: Partial<CartItem> = {
       title: `New Item ${cartItems.value.length + 1}`,
-      price: 100,
+      price: DUMMY_CART_ITEM_UNIT_PRICE,
       description: `New Item Description ${cartItems.value.length + 1}`,
       category: `Product`,
       images: [`https://picsum.photos/seed/cart-item-${Math.random()}/150/150`],

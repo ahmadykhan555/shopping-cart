@@ -2,7 +2,7 @@ import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import useTotalWithShippingCost from "../useTotalWithShippingCost";
 import useCart from "../useCart";
 import useCalculateShippingCost from "../useCalculateShippingCost";
-import { STANDARD_TAX_RATE } from "@/consts";
+import { DUMMY_CART_ITEM_UNIT_PRICE, STANDARD_TAX_RATE } from "@/consts";
 import { createDummyCartItem } from "@/utils/cart";
 
 beforeEach(() => {
@@ -31,12 +31,12 @@ describe("useTotalWithShippingCost", () => {
     const expectedShipping = 5;
 
     const { addItemToCart } = useCart();
-    // POST mock returns dummy items at price 100 → 3 items = 300 + tax
+    // POST mock returns dummy items at price 10 → 3 items = 30 + tax
     await addItemToCart();
     await addItemToCart();
     await addItemToCart();
 
-    const expectedSubtotal = 3 * 100;
+    const expectedSubtotal = 3 * DUMMY_CART_ITEM_UNIT_PRICE;
     const expectedTotalWithTax = Number(
       (expectedSubtotal * (1 + STANDARD_TAX_RATE)).toFixed(2),
     );
