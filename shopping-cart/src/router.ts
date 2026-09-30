@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { DEFAULT_ROUTE } from "@/consts";
+import { APP_ROUTES } from "@/consts";
 
 const APP_TITLE = "Neuffer";
 
@@ -8,17 +8,17 @@ const router = createRouter({
   routes: [
     {
       path: "/",
-      redirect: DEFAULT_ROUTE,
+      redirect: APP_ROUTES.DEFAULT,
     },
     {
       name: "cart",
-      path: DEFAULT_ROUTE,
+      path: APP_ROUTES.CART,
       component: () => import("./pages/CartPage.vue"),
       meta: { title: "Cart" },
     },
     {
       name: "checkout-success",
-      path: "/checkout/success",
+      path: APP_ROUTES.CHECKOUT_SUCCESS,
       component: () => import("./pages/CheckoutSuccessPage.vue"),
       meta: { title: "Order success" },
     },

@@ -28,13 +28,13 @@
           :emphasis="row.label === 'Total'"
         >
           <template #label>{{ row.label }}</template>
-          {{ row.value }}
+          <template #value>{{ row.value }}</template>
         </CartSummaryItem>
       </div>
     </div>
 
     <RouterLink
-      :to="DEFAULT_ROUTE"
+      :to="APP_ROUTES.CART"
       class="mt-8 inline-flex items-center gap-2 rounded-md bg-emerald-600 px-5 py-2.5 text-base font-medium text-white transition-colors hover:bg-emerald-700"
     >
       Back to cart
@@ -48,7 +48,7 @@ import type {
   CheckoutOrderSummary,
   CheckoutSuccessHistoryState,
 } from "@/types";
-import { DEFAULT_ROUTE } from "@/consts";
+import { APP_ROUTES } from "@/consts";
 import { formatMoney } from "@/utils";
 import confetti from "canvas-confetti";
 import { computed, onMounted, ref } from "vue";
@@ -83,8 +83,7 @@ onMounted(() => {
     count < 1 ||
     summary.itemCount !== count
   ) {
-    void router.replace(DEFAULT_ROUTE);
-    return;
+    return router.replace(APP_ROUTES.DEFAULT);
   }
 
   itemCount.value = count;
