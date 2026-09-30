@@ -21,7 +21,7 @@ type ApiCallParams<T> = {
 };
 
 export default function useApi() {
-  const { error: showErrorToast } = useToast();
+  const { showErrorToast } = useToast();
   // todo accept params as object
   const apiCall = async <T>({
     url,

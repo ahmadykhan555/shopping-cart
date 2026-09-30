@@ -6,9 +6,9 @@ const mockToastError = vi.fn();
 
 vi.mock("@/composables/useToast", () => ({
   useToast: () => ({
-    success: vi.fn(),
-    error: mockToastError,
-    info: vi.fn(),
+    showSuccessToast: vi.fn(),
+    showErrorToast: mockToastError,
+    showInfoToast: vi.fn(),
   }),
 }));
 

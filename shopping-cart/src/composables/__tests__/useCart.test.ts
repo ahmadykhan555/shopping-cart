@@ -58,9 +58,9 @@ async function seedCart(count: number) {
 
 vi.mock("@/composables/useToast", () => ({
   useToast: () => ({
-    success: vi.fn(),
-    error: vi.fn(),
-    info: vi.fn(),
+    showSuccessToast: vi.fn(),
+    showErrorToast: vi.fn(),
+    showInfoToast: vi.fn(),
   }),
 }));
 

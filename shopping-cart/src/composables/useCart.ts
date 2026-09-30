@@ -31,7 +31,7 @@ const isAddingItemToCart = ref(false);
 
 export default function useCart() {
   const { apiCall } = useApi();
-  const { success } = useToast();
+  const { showSuccessToast, showInfoToast } = useToast();
 
   // methods
   const fetchCartItems = async () => {
@@ -78,7 +78,7 @@ export default function useCart() {
             quantity: item.quantity ?? 1,
             id: cartItems.value.length + 1, // API always sends the same id so we need to override it to a unique id
           });
-          success(`"${item.title}" added to cart`);
+          showSuccessToast(`"${item.title}" added to cart`);
         },
       });
     } catch (error) {
@@ -89,7 +89,14 @@ export default function useCart() {
   };
 
   const removeItemFromCart = (id: number) => {
-    cartItems.value = cartItems.value.filter((item) => item.id !== id);
+    const itemToRemove = cartItems.value.find((item) => item.id === id);
+    if (!itemToRemove) {
+      return;
+    }
+    cartItems.value = cartItems.value.filter(
+      (item) => item.id !== itemToRemove.id,
+    );
+    showInfoToast(`"${itemToRemove.title}" removed from cart`);
   };
 
   const saveShippingCost = (cost: number) => {
