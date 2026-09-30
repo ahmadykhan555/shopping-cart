@@ -4,7 +4,7 @@ export type CartItem = {
   price: number;
   description: string;
   category: string;
-  image: string;
+  images: readonly string[];
   quantity: number;
 };
 
@@ -12,14 +12,5 @@ export type CartSummary = {
   total: number;
   tax: number;
   count: number;
-  shippingCost: number;
   totalWithTax: number;
-};
-
-export type CheckoutOrderSummary = {
-  itemCount: number;
-  subtotal: number;
-  shipping: number;
-  tax: number;
-  total: number;
 };

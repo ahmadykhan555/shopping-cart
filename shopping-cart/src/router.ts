@@ -1,14 +1,35 @@
 import { createRouter, createWebHistory } from "vue-router";
 
-import HomePage from "./pages/HomePage.vue";
-import CartPage from "./pages/CartPage.vue";
-import CheckoutSuccessPage from "./pages/CheckoutSuccessPage.vue";
+const APP_TITLE = "Neuffer";
 
-export default createRouter({
+const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: "/", component: HomePage },
-    { path: "/cart", component: CartPage },
-    { path: "/checkout/success", component: CheckoutSuccessPage },
+    {
+      name: "home",
+      path: "/",
+      component: () => import("./pages/HomePage.vue"),
+      meta: { title: "Home" },
+    },
+    {
+      name: "cart",
+      path: "/cart",
+      component: () => import("./pages/CartPage.vue"),
+      meta: { title: "Cart" },
+    },
+    {
+      name: "checkout-success",
+      path: "/checkout/success",
+      component: () => import("./pages/CheckoutSuccessPage.vue"),
+      meta: { title: "Order success" },
+    },
+    // todo add catch all for 404
   ],
 });
+
+router.afterEach((to) => {
+  const pageTitle = typeof to.meta.title === "string" ? to.meta.title : null;
+  document.title = pageTitle ? `${pageTitle} | ${APP_TITLE}` : APP_TITLE;
+});
+
+export default router;

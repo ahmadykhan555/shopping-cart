@@ -7,17 +7,17 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-const props = withDefaults(
-  defineProps<{
-    variant?: "primary" | "secondary" | "danger" | "ghost" | "link";
-    disabled?: boolean;
-    ariaLabel?: string;
-  }>(),
-  {
-    variant: "primary",
-    ariaLabel: "button",
-  },
-);
+type ButtonVariant = "primary" | "secondary" | "danger" | "ghost" | "link";
+export type ButtonProps = {
+  variant?: ButtonVariant;
+  disabled?: boolean;
+  ariaLabel?: string;
+};
+
+const props = withDefaults(defineProps<ButtonProps>(), {
+  variant: "primary",
+  ariaLabel: "button",
+});
 
 const buttonClasses = computed(() => {
   if (props.variant === "ghost") {

@@ -1,4 +1,4 @@
-import { computed } from "vue";
+import { computed, readonly } from "vue";
 import useCalculateShippingCost from "./useCalculateShippingCost";
 import useCart from "./useCart";
 
@@ -11,6 +11,6 @@ export default function useTotalWithShippingCost() {
     totalWithShippingCost: computed(
       () => summary.value.totalWithTax + shippingCost.value,
     ),
-    shippingCost: computed(() => shippingCost.value),
+    shippingCost: readonly(computed(() => shippingCost.value)),
   };
 }

@@ -1,5 +1,5 @@
 import { DEFAULT_API_OPTIONS } from "@/consts";
-import { ADD_ITEM_TO_CART_URL, FETCH_CART_ITEMS_URL } from "@/consts/cart";
+import { ADD_ITEM_TO_CART_URL, FETCH_CART_ITEMS_URL } from "@/consts";
 import { useToast } from "./useToast";
 
 const DEFAULT_API_ERROR_MESSAGE = "Something went wrong. Please try again.";
@@ -14,13 +14,20 @@ function getApiErrorMessage(url: string, init: RequestInit): string {
   return API_ERROR_MESSAGES[`${method}:${url}`] ?? DEFAULT_API_ERROR_MESSAGE;
 }
 
+type ApiCallParams<T> = {
+  url: string;
+  options?: RequestInit;
+  onSuccess?: (data: T) => void;
+};
+
 export default function useApi() {
-  const { error } = useToast();
-  const apiCall = async <T>(
-    url: string,
-    options: RequestInit = DEFAULT_API_OPTIONS,
-    onSuccess?: (data: T) => void,
-  ): Promise<void> => {
+  const { error: showErrorToast } = useToast();
+  // todo accept params as object
+  const apiCall = async <T>({
+    url,
+    options = DEFAULT_API_OPTIONS,
+    onSuccess,
+  }: ApiCallParams<T>): Promise<void> => {
     try {
       const response = await fetch(url, options);
       if (!response.ok) {
@@ -29,8 +36,10 @@ export default function useApi() {
       const data = (await response.json()) as T;
       onSuccess?.(data);
     } catch (err) {
-      console.error(err);
-      error(getApiErrorMessage(url, options));
+      const errorMessage = getApiErrorMessage(url, options);
+      console.error(errorMessage);
+      showErrorToast(errorMessage);
+      throw errorMessage;
     }
   };
 

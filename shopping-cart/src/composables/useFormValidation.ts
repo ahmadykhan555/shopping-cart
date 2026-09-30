@@ -1,12 +1,5 @@
+import type { FormFieldRules } from "@/types";
 import { computed, reactive, ref, type MaybeRefOrGetter, toValue } from "vue";
-
-export type FormFieldRules<T extends Record<string, string>> = {
-  [K in keyof T]: {
-    label?: string;
-    required?: boolean;
-    validateField?: (value: string, form: T) => string | null;
-  };
-};
 
 export default function useFormValidation<T extends Record<string, string>>(
   form: MaybeRefOrGetter<T>,
@@ -83,4 +76,4 @@ export default function useFormValidation<T extends Record<string, string>>(
     markTouched,
     validateForm,
   };
-};
+}
