@@ -52,16 +52,10 @@
             @clearCart="clearCart"
           />
         </div>
-        <template v-else>
-          <p class="py-12 text-sm text-gray-600">
-            No items in cart. Use “Add item” to add products.
-          </p>
-          <CartActions
-            class="mt-8"
-            @addItem="addItemToCart(createDummyCartItem(cartItems.length + 1))"
-            @clearCart="clearCart"
-          />
-        </template>
+        <CartEmptyState
+          v-else
+          @addItem="addItemToCart(createDummyCartItem(cartItems.length + 1))"
+        />
       </div>
     </div>
   </div>
@@ -76,6 +70,7 @@ import CartItemsColumnHeaders from "@/components/cart/CartItemsColumnHeaders.vue
 import CartActions from "@/components/cart/CartActions.vue";
 import CartShippingCostCalculator from "@/components/cart/CartShippingCostCalculator.vue";
 import CartLoadingState from "@/components/cart/CartLoadingState.vue";
+import CartEmptyState from "@/components/cart/CartEmptyState.vue";
 import { createDummyCartItem } from "@/utils/cart.ts";
 
 const {
