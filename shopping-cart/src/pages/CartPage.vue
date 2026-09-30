@@ -12,9 +12,7 @@
       </p>
     </header>
 
-    <div v-if="isFetching" class="py-12 text-sm text-gray-600">
-      Loading cart…
-    </div>
+    <CartLoadingState v-if="isFetching" />
 
     <div
       v-else
@@ -77,12 +75,14 @@ import CartSummary from "@/components/cart/CartSummary.vue";
 import CartItemsColumnHeaders from "@/components/cart/CartItemsColumnHeaders.vue";
 import CartActions from "@/components/cart/CartActions.vue";
 import CartShippingCostCalculator from "@/components/cart/CartShippingCostCalculator.vue";
+import CartLoadingState from "@/components/cart/CartLoadingState.vue";
 import { createDummyCartItem } from "@/utils/cart.ts";
 
 const {
   cartItems,
-  fetchCartItems,
   isFetching,
+  hasInitializedCart,
+  fetchCartItems,
   addItemToCart,
   clearCart,
   updateItemQuantity,
@@ -90,8 +90,7 @@ const {
 } = useCart();
 
 onMounted(() => {
-  if (!isFetching.value && !cartItems.value.length) {
-    fetchCartItems();
-  }
+  if (isFetching.value || hasInitializedCart.value) return;
+  fetchCartItems();
 });
 </script>

@@ -66,7 +66,7 @@ import useCart from "@/composables/useCart";
 import AppButton from "../base/AppButton.vue";
 import CartSummaryItem from "./CartSummaryItem.vue";
 import type { CheckoutSuccessHistoryState } from "@/types";
-import { STANDARD_TAX_RATE } from "@/consts";
+import { APP_ROUTES, STANDARD_TAX_RATE } from "@/consts";
 
 const props = withDefaults(
   defineProps<{
@@ -125,7 +125,7 @@ const handleCheckout = async () => {
   };
 
   await router.push({
-    path: "/checkout/success",
+    path: APP_ROUTES.CHECKOUT_SUCCESS,
     state: navigationState,
   });
 

@@ -11,6 +11,7 @@ import { useToast } from "./useToast";
 // data
 const cartItems = ref<CartItem[]>([]); // allows state sharing
 const isFetching = ref(false);
+const hasInitializedCart = ref(false);
 const summary = computed<CartSummary>(() => {
   const subTotal = cartItems.value.reduce(
     (acc, item) => acc + item.price * item.quantity,
@@ -55,6 +56,7 @@ export default function useCart() {
       console.error(error);
     } finally {
       isFetching.value = false;
+      hasInitializedCart.value = true;
     }
   };
 
@@ -71,7 +73,11 @@ export default function useCart() {
           body: JSON.stringify({ ...item, id: undefined }),
         },
         onSuccess: (item) => {
-          cartItems.value.push({ ...item, quantity: item.quantity ?? 1 });
+          cartItems.value.push({
+            ...item,
+            quantity: item.quantity ?? 1,
+            id: cartItems.value.length + 1, // API always sends the same id so we need to override it to a unique id
+          });
           success(`"${item.title}" added to cart`);
         },
       });
@@ -107,6 +113,7 @@ export default function useCart() {
     cartItems: readonly(cartItems),
     isFetching: readonly(isFetching),
     isAddingItemToCart: readonly(isAddingItemToCart),
+    hasInitializedCart: readonly(hasInitializedCart),
     fetchCartItems,
     addItemToCart,
     removeItemFromCart,
