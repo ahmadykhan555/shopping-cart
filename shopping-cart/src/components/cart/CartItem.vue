@@ -3,7 +3,7 @@
     class="w-full min-w-0 border-b border-gray-100 py-6 md:col-span-full xl:grid xl:grid-cols-subgrid xl:items-center"
   >
     <div class="flex min-w-0 items-center gap-4">
-      <div class="relative shrink-0 pt-1.5 pr-1.5">
+      <div class="relative shrink-0 p-0.5 pt-1.5 pr-1.5">
         <img
           :src="item.images[0]"
           :alt="item.title"

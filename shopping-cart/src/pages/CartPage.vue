@@ -37,9 +37,9 @@
           class="relative max-h-[calc(100vh-20rem)] w-full min-w-0"
         >
           <div
-            class="h-full max-h-[calc(100vh-20rem)] overflow-y-auto pb-[4.75rem] md:grid md:grid-cols-[minmax(0,1fr)_7rem_8rem_7rem] md:gap-x-6"
+            class="h-full max-h-[calc(100vh-20rem)] overflow-y-auto px-0.5 pb-19 md:grid md:grid-cols-[minmax(0,1fr)_7rem_8rem_7rem] md:gap-x-6"
           >
-            <CartItemsColumnHeaders class="max-md:hidden" />
+            <CartItemsColumnHeaders class="max-xl:hidden" />
             <CartItem
               v-for="item in cartItems"
               :key="item.id"
