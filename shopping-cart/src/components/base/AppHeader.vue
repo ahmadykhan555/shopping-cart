@@ -32,7 +32,7 @@
 <script setup lang="ts">
 import logo from "@/assets/logo.svg";
 import CartIcon from "@/assets/icons/CartIcon.vue";
-import useCart from "@/composables/useCart";
+import { useCart } from "@/composables";
 
 const { cartItems } = useCart();
 </script>

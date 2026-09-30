@@ -92,10 +92,9 @@
 <script setup lang="ts">
 import { reactive, ref } from "vue";
 import AppButton from "../base/AppButton.vue";
-import useFormValidation from "@/composables/useFormValidation";
+import { useCart, useFormValidation } from "@/composables";
 import type { FormFieldRules } from "@/types";
 import { calculateRandomShippingCost, formatMoney } from "@/utils";
-import useCart from "@/composables/useCart";
 
 type ShippingForm = {
   origin: string;

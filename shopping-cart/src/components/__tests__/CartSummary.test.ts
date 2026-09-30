@@ -1,7 +1,7 @@
 import { cleanup, render, screen } from "@testing-library/vue";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import CartSummary from "../cart/CartSummary.vue";
-import useCart from "@/composables/useCart";
+import { useCart } from "@/composables";
 import { createDummyCartItem, formatMoney } from "@/utils";
 import { STANDARD_TAX_RATE } from "@/consts";
 

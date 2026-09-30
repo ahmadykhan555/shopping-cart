@@ -63,7 +63,7 @@
 
 <script setup lang="ts">
 import { onMounted } from "vue";
-import useCart from "@/composables/useCart";
+import { useCart } from "@/composables";
 import CartItem from "@/components/cart/CartItem.vue";
 import CartSummary from "@/components/cart/CartSummary.vue";
 import CartItemsColumnHeaders from "@/components/cart/CartItemsColumnHeaders.vue";

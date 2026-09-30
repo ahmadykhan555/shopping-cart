@@ -62,7 +62,7 @@
 import { formatMoney } from "@/utils";
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
-import useCart from "@/composables/useCart";
+import { useCart } from "@/composables";
 import AppButton from "../base/AppButton.vue";
 import CartSummaryItem from "./CartSummaryItem.vue";
 import type { CheckoutSuccessHistoryState } from "@/types";

@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import useCart from "@/composables/useCart";
+import { useCart } from "@/composables";
 import AppButton from "../base/AppButton.vue";
 
 defineEmits(["addItem", "clearCart"]);
