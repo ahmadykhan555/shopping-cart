@@ -4,6 +4,7 @@ import AppHeader from "../base/AppHeader.vue";
 import { renderWithRouter } from "@/test/utils.ts";
 import userEvent from "@testing-library/user-event";
 import useCart from "@/composables/useCart.ts";
+import { DEFAULT_ROUTE } from "@/consts";
 import { createDummyCartItem } from "@/utils/cart.ts";
 
 vi.mock("@/composables/useToast", () => ({
@@ -31,28 +32,28 @@ afterEach(() => {
 });
 
 describe("AppHeader", () => {
-  it("renders links to home and cart pages", async () => {
+  it("renders logo and cart links", async () => {
     await renderWithRouter(AppHeader);
-    const homeLink = screen.getByRole("link", { name: "Home" });
-    expect(homeLink).toBeInTheDocument();
-    const cartLink = screen.getByRole("link", { name: "Cart" });
-    expect(cartLink).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Neuffer" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Cart" })).toBeInTheDocument();
   });
 
-  it("navigates to correct page when home and cart links are clicked", async () => {
-    const { router } = await renderWithRouter(AppHeader);
+  it("navigates to cart when logo or cart link is clicked", async () => {
+    const { router } = await renderWithRouter(AppHeader, "/checkout/success");
     const user = userEvent.setup();
+
+    await user.click(screen.getByTestId("site-logo"));
+    await waitFor(() => {
+      expect(router.currentRoute.value.path).toBe(DEFAULT_ROUTE);
+    });
+
+    await router.push("/checkout/success");
+    await router.isReady();
 
     const cartLink = screen.getByRole("link", { name: "Cart" });
     await user.click(cartLink);
     await waitFor(() => {
-      expect(router.currentRoute.value.path).toBe("/cart");
-    });
-
-    const homeLink = screen.getByRole("link", { name: "Home" });
-    await user.click(homeLink);
-    await waitFor(() => {
-      expect(router.currentRoute.value.path).toBe("/");
+      expect(router.currentRoute.value.path).toBe(DEFAULT_ROUTE);
     });
   });
 

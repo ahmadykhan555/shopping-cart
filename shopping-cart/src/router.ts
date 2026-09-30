@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { DEFAULT_ROUTE } from "@/consts";
 
 const APP_TITLE = "Neuffer";
 
@@ -6,14 +7,12 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
-      name: "home",
       path: "/",
-      component: () => import("./pages/HomePage.vue"),
-      meta: { title: "Home" },
+      redirect: DEFAULT_ROUTE,
     },
     {
       name: "cart",
-      path: "/cart",
+      path: DEFAULT_ROUTE,
       component: () => import("./pages/CartPage.vue"),
       meta: { title: "Cart" },
     },
