@@ -4,12 +4,13 @@
   >
     <div class="flex min-w-0 items-center gap-4">
       <div
-        class="relative shrink-0 p-0.5 pt-1.5 pr-1.5 h-20 w-20 ring-1 ring-gray-200/80 rounded-lg"
+        class="relative shrink-0 h-20 w-20 ring-1 ring-gray-200/80 rounded-lg"
       >
         <img
           v-if="item.images?.length"
           :src="item.images[0]"
           :alt="item.title"
+          loading="lazy"
           class="size-full object-cover"
         />
         <button
@@ -36,7 +37,7 @@
     <QuantitySelector
       class="justify-self-start self-center"
       :quantity="item.quantity"
-      @update:quantity="emit('click:updateItemQuantity', item.id, $event)"
+      @update:quantity="emit('updateItemQuantity', item.id, $event)"
     />
     <p class="text-right text-base font-medium tabular-nums text-gray-900">
       {{ formatMoney(item.price * item.quantity) }}
@@ -48,7 +49,6 @@ import type { CartItem } from "@/types";
 import { formatMoney } from "@/utils";
 import XIcon from "@/assets/icons/XIcon.vue";
 import QuantitySelector from "./QuantitySelector.vue";
-import type { Ref } from "vue";
 
 defineProps<{
   item: Readonly<CartItem>;
@@ -56,6 +56,6 @@ defineProps<{
 
 const emit = defineEmits<{
   "click:removeItem": [id: number];
-  "click:updateItemQuantity": [id: number, quantity: number];
+  updateItemQuantity: [id: number, quantity: number];
 }>();
 </script>

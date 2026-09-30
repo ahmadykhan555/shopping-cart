@@ -42,19 +42,19 @@
               v-for="item in cartItems"
               :key="item.id"
               :item="item"
-              @click:updateItemQuantity="updateItemQuantity"
+              @updateItemQuantity="updateItemQuantity"
               @click:removeItem="removeItemFromCart"
             />
           </div>
           <CartActions
             class="absolute inset-x-0 bottom-0 z-10 bg-white/75 backdrop-blur-md"
-            @addItem="addItemToCart(createDummyCartItem(cartItems.length + 1))"
+            @addItem="addItemToCart(createDummyCartItem(getNextItemId()))"
             @clearCart="clearCart"
           />
         </div>
         <CartEmptyState
           v-else
-          @addItem="addItemToCart(createDummyCartItem(cartItems.length + 1))"
+          @addItem="addItemToCart(createDummyCartItem(getNextItemId()))"
         />
       </div>
     </div>
@@ -82,6 +82,7 @@ const {
   clearCart,
   updateItemQuantity,
   removeItemFromCart,
+  getNextItemId,
 } = useCart();
 
 onMounted(() => {

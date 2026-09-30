@@ -57,7 +57,7 @@ async function seedCart(count: number) {
 }
 
 vi.mock("@/composables/useToast", () => ({
-  useToast: () => ({
+  default: () => ({
     showSuccessToast: vi.fn(),
     showErrorToast: vi.fn(),
     showInfoToast: vi.fn(),
@@ -65,7 +65,7 @@ vi.mock("@/composables/useToast", () => ({
 }));
 
 afterEach(() => {
-  useCart().clearCart();
+  useCart().resetCartState();
 });
 
 describe("useCart composable", () => {

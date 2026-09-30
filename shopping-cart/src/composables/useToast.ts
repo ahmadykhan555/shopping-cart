@@ -1,6 +1,6 @@
 import { push } from "notivue";
 
-export function useToast() {
+export default function useToast() {
   return {
     showSuccessToast: (message: string) => push.success(message),
     showErrorToast: (message: string) => push.error(message),

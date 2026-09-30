@@ -8,7 +8,7 @@ import { DEFAULT_ROUTE } from "@/consts";
 import { createDummyCartItem } from "@/utils/cart.ts";
 
 vi.mock("@/composables/useToast", () => ({
-  useToast: () => ({
+  default: () => ({
     showSuccessToast: vi.fn(),
     showErrorToast: vi.fn(),
     showInfoToast: vi.fn(),
@@ -23,7 +23,7 @@ beforeEach(() => {
       json: async () => ({}),
     }),
   );
-  useCart().clearCart();
+  useCart().resetCartState();
 });
 
 afterEach(() => {
@@ -58,10 +58,10 @@ describe("AppHeader", () => {
   });
 
   it("displays the cart count when there are items in the cart", async () => {
-    const { addItemToCart } = useCart();
-    await addItemToCart(createDummyCartItem(1));
-    await addItemToCart(createDummyCartItem(2));
-    await addItemToCart(createDummyCartItem(3));
+    const { addItemToCart, getNextItemId } = useCart();
+    await addItemToCart(createDummyCartItem(getNextItemId()));
+    await addItemToCart(createDummyCartItem(getNextItemId()));
+    await addItemToCart(createDummyCartItem(getNextItemId()));
 
     await renderWithRouter(AppHeader);
     const cartLink = screen.getByRole("link", { name: /cart/i });

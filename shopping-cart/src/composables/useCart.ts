@@ -6,7 +6,7 @@ import {
   ADD_ITEM_TO_CART_URL,
 } from "@/consts";
 import useApi from "./useApi";
-import { useToast } from "./useToast";
+import useToast from "./useToast";
 
 // data
 const cartItems = ref<CartItem[]>([]); // allows state sharing
@@ -29,9 +29,18 @@ const summary = computed<CartSummary>(() => {
 const shippingCost = ref(0);
 const isAddingItemToCart = ref(false);
 
+const getNextItemId = () => {
+  return (
+    cartItems.value.reduce(
+      (maxId, cartItem) => Math.max(maxId, cartItem.id),
+      0,
+    ) + 1
+  );
+};
+
 export default function useCart() {
   const { apiCall } = useApi();
-  const { showSuccessToast, showInfoToast } = useToast();
+  const { showSuccessToast } = useToast();
 
   // methods
   const fetchCartItems = async () => {
@@ -62,7 +71,6 @@ export default function useCart() {
 
   const addItemToCart = async (item: Omit<CartItem, "id">) => {
     if (isAddingItemToCart.value) return;
-
     isAddingItemToCart.value = true;
     try {
       await apiCall<CartItem>({
@@ -76,7 +84,7 @@ export default function useCart() {
           cartItems.value.push({
             ...item,
             quantity: item.quantity ?? 1,
-            id: cartItems.value.length + 1, // API always sends the same id so we need to override it to a unique id
+            id: getNextItemId(), // API always sends the same id so we need to override it to a unique id
           });
           showSuccessToast(`"${item.title}" added to cart`);
         },
@@ -96,7 +104,7 @@ export default function useCart() {
     cartItems.value = cartItems.value.filter(
       (item) => item.id !== itemToRemove.id,
     );
-    showInfoToast(`"${itemToRemove.title}" removed from cart`);
+    showSuccessToast(`"${itemToRemove.title}" removed from cart`);
   };
 
   const saveShippingCost = (cost: number) => {
@@ -104,9 +112,21 @@ export default function useCart() {
     shippingCost.value = Number(cost.toFixed(2));
   };
 
-  const clearCart = () => {
+  const emptyCart = () => {
     cartItems.value = [];
     shippingCost.value = 0;
+  };
+
+  const clearCart = () => {
+    emptyCart();
+    showSuccessToast("Cart Emptied");
+  };
+
+  const resetCartState = () => {
+    emptyCart();
+    isFetching.value = false;
+    hasInitializedCart.value = false;
+    isAddingItemToCart.value = false;
   };
 
   const updateItemQuantity = (id: number, quantity: number) => {
@@ -124,8 +144,11 @@ export default function useCart() {
     fetchCartItems,
     addItemToCart,
     removeItemFromCart,
-    clearCart,
     updateItemQuantity,
     saveShippingCost,
+    emptyCart,
+    clearCart,
+    resetCartState,
+    getNextItemId,
   };
 }

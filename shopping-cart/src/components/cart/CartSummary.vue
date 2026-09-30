@@ -86,7 +86,7 @@ const toggleCollapsed = () => {
 };
 
 const router = useRouter();
-const { isFetching, summary, cartItems, clearCart } = useCart();
+const { isFetching, summary, cartItems, emptyCart } = useCart();
 
 const summaryItems = computed(() => [
   {
@@ -129,7 +129,7 @@ const handleCheckout = async () => {
     state: navigationState,
   });
 
-  clearCart();
+  emptyCart();
 };
 
 const isCheckoutDisabled = computed(

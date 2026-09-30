@@ -17,6 +17,7 @@ vi.stubGlobal(
 beforeEach(() => {
   vi.clearAllMocks();
   cleanup();
+  useCart().resetCartState();
 });
 describe("CartSummary", () => {
   // general sanity check
@@ -53,12 +54,10 @@ describe("CartSummary", () => {
     render(CartSummary);
 
     const subTotalRow = screen.getByText(/Subtotal/i).closest("div");
-    const shippingCostRow = screen.getByText(/shipping/i).closest("div");
     const taxRow = screen.getByText(/tax/i).closest("div");
     const totalRow = screen.getByText("Total").closest("div");
 
     const oldSubTotal = summary.value.subTotal;
-    const oldShippingCost = summary.value.shippingCost;
 
     const addItemPayload = createDummyCartItem(1);
     await addItemToCart(addItemPayload);
@@ -78,9 +77,4 @@ describe("CartSummary", () => {
       formatMoney(expectedTotal).replace(/\u00a0/g, " "),
     );
   });
-
-  // subtotal is correct and updates correctly
-  // shipping cost is correct and updates correctly
-  //   tax is correct and updates correctly
-  // total is correct and updates correctly
 });
