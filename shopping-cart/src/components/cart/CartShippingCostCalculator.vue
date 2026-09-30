@@ -22,12 +22,12 @@
     </AppButton>
 
     <div
-      v-if="shippingCost > 0"
+      v-if="summary.shippingCost > 0"
       class="mt-3 flex items-center justify-between border-t border-gray-200 pt-3"
     >
       <span class="text-sm text-gray-600">Estimated shipping</span>
       <span class="text-base font-semibold tabular-nums text-gray-900">
-        {{ formatMoney(shippingCost) }}
+        {{ formatMoney(summary.shippingCost) }}
       </span>
     </div>
 
@@ -92,10 +92,10 @@
 <script setup lang="ts">
 import { reactive, ref } from "vue";
 import AppButton from "../base/AppButton.vue";
-import useCalculateShippingCost from "@/composables/useCalculateShippingCost";
 import useFormValidation from "@/composables/useFormValidation";
 import type { FormFieldRules } from "@/types";
-import { formatMoney } from "@/utils";
+import { calculateRandomShippingCost, formatMoney } from "@/utils";
+import useCart from "@/composables/useCart.ts";
 
 type ShippingForm = {
   origin: string;
@@ -178,7 +178,7 @@ const { errors, markTouched, validateForm, isValid } = useFormValidation(
   fieldRules,
 );
 
-const { calculateShippingCost, shippingCost } = useCalculateShippingCost();
+const { summary, saveShippingCost } = useCart();
 const isCollapsed = ref(props.initialCollapsed);
 
 const toggleCollapsed = () => {
@@ -192,6 +192,6 @@ const handleCalculateShipping = () => {
   if (!validateForm()) {
     return;
   }
-  calculateShippingCost();
+  saveShippingCost(calculateRandomShippingCost());
 };
 </script>

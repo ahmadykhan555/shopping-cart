@@ -25,7 +25,7 @@
     >
       <span class="text-sm text-gray-600">Total</span>
       <span class="text-base font-semibold tabular-nums text-gray-900">
-        {{ formatMoney(orderTotal) }}
+        {{ formatMoney(summary.total) }}
       </span>
     </div>
 
@@ -41,7 +41,7 @@
           :emphasis="item.label === 'Total'"
         >
           <template #label>{{ item.label }}</template>
-          {{ item.value }}
+          <template #value>{{ item.value }}</template>
         </CartSummaryItem>
       </div>
 
@@ -65,8 +65,8 @@ import { useRouter } from "vue-router";
 import useCart from "@/composables/useCart";
 import AppButton from "../base/AppButton.vue";
 import CartSummaryItem from "./CartSummaryItem.vue";
-import useTotalWithShippingCost from "@/composables/useTotalWithShippingCost";
 import type { CheckoutSuccessHistoryState } from "@/types";
+import { STANDARD_TAX_RATE } from "@/consts";
 
 const props = withDefaults(
   defineProps<{
@@ -87,31 +87,23 @@ const toggleCollapsed = () => {
 
 const router = useRouter();
 const { isFetching, summary, cartItems, clearCart } = useCart();
-const { totalWithoutShippingCost, totalWithShippingCost, shippingCost } =
-  useTotalWithShippingCost();
-
-const orderTotal = computed(() =>
-  shippingCost.value
-    ? totalWithShippingCost.value
-    : totalWithoutShippingCost.value,
-);
 
 const summaryItems = computed(() => [
   {
     label: "Subtotal",
-    value: formatMoney(summary.value.total),
+    value: formatMoney(summary.value.subTotal),
   },
   {
     label: "Shipping",
-    value: formatMoney(shippingCost.value),
+    value: formatMoney(summary.value.shippingCost),
   },
   {
-    label: "Tax",
+    label: `Tax (${STANDARD_TAX_RATE * 100}%)`,
     value: formatMoney(summary.value.tax),
   },
   {
     label: "Total",
-    value: formatMoney(orderTotal.value),
+    value: formatMoney(summary.value.total),
   },
 ]);
 
@@ -125,10 +117,10 @@ const handleCheckout = async () => {
     itemCount,
     orderSummary: {
       itemCount,
-      subtotal: summary.value.total,
-      shipping: shippingCost.value,
+      subtotal: summary.value.subTotal,
+      shipping: summary.value.shippingCost,
       tax: summary.value.tax,
-      total: orderTotal.value,
+      total: summary.value.total,
     },
   };
 
@@ -141,6 +133,6 @@ const handleCheckout = async () => {
 };
 
 const isCheckoutDisabled = computed(
-  () => isFetching.value || !summary.value.total,
+  () => isFetching.value || !summary.value.subTotal,
 );
 </script>

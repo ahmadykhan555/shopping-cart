@@ -12,19 +12,20 @@ import { useToast } from "./useToast";
 const cartItems = ref<CartItem[]>([]); // allows state sharing
 const isFetching = ref(false);
 const summary = computed<CartSummary>(() => {
-  const total = cartItems.value.reduce(
+  const subTotal = cartItems.value.reduce(
     (acc, item) => acc + item.price * item.quantity,
     0,
   );
-  const tax = total * STANDARD_TAX_RATE;
+  const tax = subTotal * STANDARD_TAX_RATE;
   return {
-    total: Number(total.toFixed(2)),
+    subTotal: Number(subTotal.toFixed(2)),
     tax: Number(tax.toFixed(2)),
     count: cartItems.value.length,
-    totalWithTax: Number((total + tax).toFixed(2)),
+    shippingCost: Number(shippingCost.value.toFixed(2)),
+    total: Number((subTotal + tax + shippingCost.value).toFixed(2)),
   };
 });
-
+const shippingCost = ref(0);
 const isAddingItemToCart = ref(false);
 
 export default function useCart() {
@@ -85,7 +86,15 @@ export default function useCart() {
     cartItems.value = cartItems.value.filter((item) => item.id !== id);
   };
 
-  const clearCart = () => (cartItems.value = []);
+  const saveShippingCost = (cost: number) => {
+    if (!Number.isFinite(cost) || cost < 0) return;
+    shippingCost.value = Number(cost.toFixed(2));
+  };
+
+  const clearCart = () => {
+    cartItems.value = [];
+    shippingCost.value = 0;
+  };
 
   const updateItemQuantity = (id: number, quantity: number) => {
     cartItems.value = cartItems.value.map((item) =>
@@ -103,5 +112,6 @@ export default function useCart() {
     removeItemFromCart,
     clearCart,
     updateItemQuantity,
+    saveShippingCost,
   };
 }

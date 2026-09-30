@@ -1,11 +1,7 @@
 <template>
   <div
     class="flex items-center justify-between py-3"
-    :class="
-      emphasis
-        ? 'pt-4 pb-0'
-        : 'border-b border-gray-200'
-    "
+    :class="emphasis ? 'pt-4 pb-0' : 'border-b border-gray-200'"
   >
     <p
       :class="
@@ -23,7 +19,7 @@
           : 'text-sm font-medium tabular-nums text-gray-900'
       "
     >
-      <slot />
+      <slot name="value" />
     </p>
   </div>
 </template>

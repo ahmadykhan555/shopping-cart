@@ -34,8 +34,8 @@ function assertSummaryFromSubtotal(
   summary: Readonly<Ref<CartSummary>>,
   expectedTotalWithoutTax: number,
 ) {
-  expect(summary.value.total).toEqual(expectedTotalWithoutTax);
-  expect(summary.value.totalWithTax).toEqual(
+  expect(summary.value.subTotal).toEqual(expectedTotalWithoutTax);
+  expect(summary.value.total).toEqual(
     expectedTotalWithoutTax * STANDARD_TAX_RATE + expectedTotalWithoutTax,
   );
 }
@@ -73,10 +73,10 @@ describe("useCart composable", () => {
   it("initial cart state - empty cart", () => {
     const { cartItems, summary, isFetching } = useCart();
     expect(cartItems.value.length).toEqual(0);
-    expect(summary.value.total).toEqual(0);
+    expect(summary.value.subTotal).toEqual(0);
     expect(summary.value.tax).toEqual(0);
     expect(summary.value.count).toEqual(0);
-    expect(summary.value.totalWithTax).toEqual(0);
+    expect(summary.value.total).toEqual(0);
     expect(isFetching.value).toEqual(false);
   });
 
@@ -89,8 +89,8 @@ describe("useCart composable", () => {
       return acc;
     }, 0);
     const tax = totalWithoutTax * STANDARD_TAX_RATE;
-    expect(summary.value.total).toEqual(totalWithoutTax);
-    expect(summary.value.totalWithTax).toEqual(tax + totalWithoutTax);
+    expect(summary.value.subTotal).toEqual(totalWithoutTax);
+    expect(summary.value.total).toEqual(tax + totalWithoutTax);
   });
 
   // 3. add item to cart, assert totals are correctly updated
@@ -127,10 +127,10 @@ describe("useCart composable", () => {
     const { summary, removeItemFromCart, cartItems } = await seedCart(5);
 
     expect(cartItems.value.length).toEqual(5);
-    const totalBeforeRemove = summary.value.total;
+    const totalBeforeRemove = summary.value.subTotal;
     await removeItemFromCart(1);
     expect(cartItems.value.length).toEqual(4);
-    expect(summary.value.total).toEqual(
+    expect(summary.value.subTotal).toEqual(
       totalBeforeRemove - DUMMY_CART_ITEM_UNIT_PRICE,
     );
   });
@@ -140,10 +140,10 @@ describe("useCart composable", () => {
     const { summary, clearCart, cartItems } = await seedCart(5);
 
     expect(cartItems.value.length).toEqual(5);
-    const totalBeforeClear = summary.value.total;
+    const totalBeforeClear = summary.value.subTotal;
     assertSummaryFromSubtotal(summary, totalBeforeClear);
     await clearCart();
     expect(cartItems.value.length).toEqual(0);
-    expect(summary.value.total).toEqual(0);
+    expect(summary.value.subTotal).toEqual(0);
   });
 });
