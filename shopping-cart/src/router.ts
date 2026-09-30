@@ -23,6 +23,11 @@ const router = createRouter({
       meta: { title: "Order success" },
     },
     // todo add catch all for 404
+    {
+      name: "not-found",
+      path: "/:pathMatch(.*)*",
+      redirect: APP_ROUTES.DEFAULT,
+    },
   ],
 });
 
