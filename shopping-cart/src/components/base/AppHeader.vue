@@ -18,10 +18,10 @@
       :to="{ name: 'cart' }"
     >
       <span
-        v-if="cartItems.length"
+        v-if="summary.count"
         class="absolute -right-1 -top-2.5 min-w-5 rounded-full bg-emerald-600 px-1.5 py-0.5 text-center text-[10px] font-semibold leading-none text-white"
       >
-        {{ cartItems.length }}
+        {{ summary.count }}
       </span>
       <span class="hidden md:inline">Cart</span>
       <CartIcon class="size-6" />
@@ -34,5 +34,5 @@ import logo from "@/assets/logo.svg";
 import CartIcon from "@/assets/icons/CartIcon.vue";
 import { useCart } from "@/composables";
 
-const { cartItems } = useCart();
+const { summary } = useCart();
 </script>

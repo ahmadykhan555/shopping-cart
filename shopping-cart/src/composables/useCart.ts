@@ -13,6 +13,7 @@ import useToast from "./useToast";
 const cartItems = ref<CartItem[]>([]); // allows state sharing
 const isFetching = ref(false);
 const hasInitializedCart = ref(false);
+const shippingCost = ref(0);
 const summary = computed<CartSummary>(() => {
   const subTotal = cartItems.value.reduce(
     (acc, item) => acc + item.price * item.quantity,
@@ -22,12 +23,11 @@ const summary = computed<CartSummary>(() => {
   return {
     subTotal: Number(subTotal.toFixed(2)),
     tax: Number(tax.toFixed(2)),
-    count: cartItems.value.length,
+    count: cartItems.value.reduce((acc, item) => acc + item.quantity, 0),
     shippingCost: Number(shippingCost.value.toFixed(2)),
     total: Number((subTotal + tax + shippingCost.value).toFixed(2)),
   };
 });
-const shippingCost = ref(0);
 const isAddingItemToCart = ref(false);
 
 const getNextItemId = () => {

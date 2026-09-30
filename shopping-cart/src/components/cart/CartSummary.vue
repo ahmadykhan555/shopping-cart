@@ -108,7 +108,7 @@ const summaryItems = computed(() => [
 ]);
 
 const handleCheckout = async () => {
-  const itemCount = cartItems.value.length;
+  const itemCount = summary.value.count;
   if (itemCount < 1) {
     return;
   }
@@ -124,12 +124,15 @@ const handleCheckout = async () => {
     },
   };
 
-  await router.push({
-    path: APP_ROUTES.CHECKOUT_SUCCESS,
-    state: navigationState,
-  });
-
-  emptyCart();
+  try {
+    await router.push({
+      path: APP_ROUTES.CHECKOUT_SUCCESS,
+      state: navigationState,
+    });
+    emptyCart();
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 const isCheckoutDisabled = computed(
