@@ -11,7 +11,7 @@
     </button>
     <input
       type="number"
-      v-model="selectedQuantity"
+      v-model.number="selectedQuantity"
       :min="minQuantity"
       :max="maxQuantity"
       class="h-full min-h-0 min-w-0 flex-1 border-0 bg-gray-50/90 p-0 text-center text-base font-medium leading-none tabular-nums text-gray-700 focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"

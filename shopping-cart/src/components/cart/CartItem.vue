@@ -3,15 +3,18 @@
     class="w-full min-w-0 border-b border-gray-100 py-6 md:col-span-full xl:grid xl:grid-cols-subgrid xl:items-center"
   >
     <div class="flex min-w-0 items-center gap-4">
-      <div class="relative shrink-0 p-0.5 pt-1.5 pr-1.5">
+      <div
+        class="relative shrink-0 p-0.5 pt-1.5 pr-1.5 h-20 w-20 ring-1 ring-gray-200/80 rounded-lg"
+      >
         <img
+          v-if="item.images?.length"
           :src="item.images[0]"
           :alt="item.title"
-          class="h-20 w-20 rounded-lg object-cover ring-1 ring-gray-200/80"
+          class="size-full object-cover"
         />
         <button
           type="button"
-          class="absolute right-0 top-0 flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-gray-100/90 text-gray-600 shadow-sm ring-1 ring-gray-200/80 backdrop-blur-sm transition-colors hover:bg-red-600 hover:text-white hover:ring-red-600/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-red-500"
+          class="absolute -right-2 -top-2 flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-gray-100/90 text-gray-600 shadow-sm ring-1 ring-gray-200/80 backdrop-blur-sm transition-colors hover:bg-red-600 hover:text-white hover:ring-red-600/80 focus-visible:outline focus-visible:outline-offset-1 focus-visible:outline-red-500"
           :aria-label="`Remove ${item.title} from cart`"
           @click="emit('click:removeItem', item.id)"
         >
