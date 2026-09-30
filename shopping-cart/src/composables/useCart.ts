@@ -46,56 +46,48 @@ export default function useCart() {
   // methods
   const fetchCartItems = async () => {
     isFetching.value = true;
-    try {
-      await apiCall<{ products: CartItem[] }>({
-        url: FETCH_CART_ITEMS_URL,
-
-        onSuccess: (rawResponse) => {
-          cartItems.value = rawResponse.products.map((item) => ({
-            id: item.id,
-            title: item.title,
-            price: item.price,
-            description: item.description,
-            category: item.category,
-            images: item.images,
-            quantity: item.quantity ?? 1,
-          }));
-          hasInitializedCart.value = true;
-        },
-      });
-    } catch (error) {
-      console.error(error);
-      hasInitializedCart.value = false;
-    } finally {
-      isFetching.value = false;
-    }
+    await apiCall<{ products: CartItem[] }>({
+      url: FETCH_CART_ITEMS_URL,
+      onSuccess: (rawResponse) => {
+        cartItems.value = rawResponse.products.map((item) => ({
+          id: item.id,
+          title: item.title,
+          price: item.price,
+          description: item.description,
+          category: item.category,
+          images: item.images,
+          quantity: item.quantity ?? 1,
+          // API has more fields that we don't need, thus no spread
+        }));
+        hasInitializedCart.value = true;
+      },
+      onError: () => {
+        hasInitializedCart.value = false;
+      },
+    });
+    isFetching.value = false;
   };
 
   const addItemToCart = async (item: Omit<CartItem, "id">) => {
     if (isAddingItemToCart.value) return;
     isAddingItemToCart.value = true;
-    try {
-      await apiCall<CartItem>({
-        url: ADD_ITEM_TO_CART_URL,
-        options: {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...item, id: undefined }),
-        },
-        onSuccess: (item) => {
-          cartItems.value.push({
-            ...item,
-            quantity: item.quantity ?? 1,
-            id: getNextItemId(), // API always sends the same id so we need to override it to a unique id
-          });
-          showSuccessToast(`"${item.title}" added to cart`);
-        },
-      });
-    } catch (error) {
-      console.error(error);
-    } finally {
-      isAddingItemToCart.value = false;
-    }
+    await apiCall<CartItem>({
+      url: ADD_ITEM_TO_CART_URL,
+      options: {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...item, id: undefined }),
+      },
+      onSuccess: (item) => {
+        cartItems.value.push({
+          ...item,
+          quantity: item.quantity ?? 1,
+          id: getNextItemId(), // API always sends the same id so we need to override it to a unique id
+        });
+        showSuccessToast(`"${item.title}" added to cart`);
+      },
+    });
+    isAddingItemToCart.value = false;
   };
 
   const removeItemFromCart = (id: number) => {

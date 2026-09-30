@@ -18,6 +18,7 @@ type ApiCallParams<T> = {
   url: string;
   options?: RequestInit;
   onSuccess?: (data: T) => void;
+  onError?: (message: string) => void;
 };
 
 export default function useApi() {
@@ -27,7 +28,8 @@ export default function useApi() {
     url,
     options = DEFAULT_API_OPTIONS,
     onSuccess,
-  }: ApiCallParams<T>): Promise<void> => {
+    onError,
+  }: ApiCallParams<T>): Promise<boolean> => {
     try {
       const response = await fetch(url, options);
       if (!response.ok) {
@@ -35,11 +37,13 @@ export default function useApi() {
       }
       const data = (await response.json()) as T;
       onSuccess?.(data);
+      return true;
     } catch (err) {
       const errorMessage = getApiErrorMessage(url, options);
-      console.error(errorMessage);
+      console.error(errorMessage, err);
       showErrorToast(errorMessage);
-      throw errorMessage;
+      onError?.(errorMessage);
+      return false;
     }
   };
 
