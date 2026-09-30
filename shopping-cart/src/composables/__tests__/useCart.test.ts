@@ -80,7 +80,6 @@ afterEach(() => {
 });
 
 describe("useCart composable", () => {
-  // 1. initial state: 0 items in cart, summary is 0, items are empty, isFetching is false
   it("initial cart state - empty cart", () => {
     const { cartItems, summary, isFetching } = useCart();
     expect(cartItems.value.length).toEqual(0);
@@ -91,7 +90,6 @@ describe("useCart composable", () => {
     expect(isFetching.value).toEqual(false);
   });
 
-  // 2. cart items are fetched, limit respected, quantity is set to 1 as a fallback, sub total and total are calculated - no shipping cost
   it("cart state is correct after fetching cart items", async () => {
     const { cartItems, summary } = await seedCart(MAX_CART_ITEMS);
     assertCartSize(cartItems, summary, MAX_CART_ITEMS);
@@ -104,7 +102,6 @@ describe("useCart composable", () => {
     expect(summary.value.total).toEqual(tax + totalWithoutTax);
   });
 
-  // 3. add item to cart, assert totals are correctly updated
   it("add item to cart, assert totals are correctly updated", async () => {
     const { summary, addItemToCart, cartItems } = await seedCart(5);
 
@@ -116,7 +113,6 @@ describe("useCart composable", () => {
     assertSummaryFromSubtotal(summary, 6 * DUMMY_CART_ITEM_UNIT_PRICE);
   });
 
-  // 4. update item quantity, assert totals are correctly updated
   it("update item quantity, assert totals are correctly updated", async () => {
     const { summary, updateItemQuantity, cartItems } = await seedCart(5);
 
@@ -150,7 +146,6 @@ describe("useCart composable", () => {
     expect(cartItems.value.find((item) => item.id === 999)).toBeUndefined();
   });
 
-  // 5. remove item from cart, assert totals are correctly updated
   it("remove item from cart, assert totals are correctly updated", async () => {
     const { summary, removeItemFromCart, cartItems } = await seedCart(5);
 
@@ -163,7 +158,6 @@ describe("useCart composable", () => {
     );
   });
 
-  // 6. added items always get a unique id, even after a removal
   it("assigns a unique id to added items after a removal", async () => {
     const { cartItems, addItemToCart, removeItemFromCart } = await seedCart(5);
 
@@ -175,7 +169,6 @@ describe("useCart composable", () => {
     expect(ids.at(-1)).toEqual(6);
   });
 
-  // 7. clear cart, assert totals are correctly updated
   it("clear cart, assert totals are correctly updated", async () => {
     const { summary, clearCart, cartItems } = await seedCart(5);
 
