@@ -4,11 +4,8 @@ import {
   STANDARD_TAX_RATE,
   FETCH_CART_ITEMS_URL,
   ADD_ITEM_TO_CART_URL,
-  MAX_CART_ITEMS,
-  DUMMY_CART_ITEM_UNIT_PRICE,
 } from "@/consts";
 import useApi from "./useApi";
-import { createDummyCartItem } from "@/utils/cart";
 import { useToast } from "./useToast";
 
 // data
@@ -27,6 +24,8 @@ const summary = computed<CartSummary>(() => {
     totalWithTax: Number((total + tax).toFixed(2)),
   };
 });
+
+const isAddingItemToCart = ref(false);
 
 export default function useCart() {
   const { apiCall } = useApi();
@@ -59,19 +58,27 @@ export default function useCart() {
   };
 
   const addItemToCart = async (item: Omit<CartItem, "id">) => {
-    debugger;
-    await apiCall<CartItem>({
-      url: ADD_ITEM_TO_CART_URL,
-      options: {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...item, id: undefined }),
-      },
-      onSuccess: (item) => {
-        cartItems.value.push({ ...item, quantity: item.quantity ?? 1 });
-        success(`"${item.title}" added to cart`);
-      },
-    });
+    if (isAddingItemToCart.value) return;
+
+    isAddingItemToCart.value = true;
+    try {
+      await apiCall<CartItem>({
+        url: ADD_ITEM_TO_CART_URL,
+        options: {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...item, id: undefined }),
+        },
+        onSuccess: (item) => {
+          cartItems.value.push({ ...item, quantity: item.quantity ?? 1 });
+          success(`"${item.title}" added to cart`);
+        },
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      isAddingItemToCart.value = false;
+    }
   };
 
   const removeItemFromCart = (id: number) => {
@@ -90,6 +97,7 @@ export default function useCart() {
     summary: readonly(summary),
     cartItems: readonly(cartItems),
     isFetching: readonly(isFetching),
+    isAddingItemToCart: readonly(isAddingItemToCart),
     fetchCartItems,
     addItemToCart,
     removeItemFromCart,
