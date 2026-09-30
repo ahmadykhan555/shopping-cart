@@ -5,7 +5,6 @@ import { renderWithRouter } from "@/test/utils.ts";
 import userEvent from "@testing-library/user-event";
 import { useCart } from "@/composables";
 import { DEFAULT_ROUTE } from "@/consts";
-import { createDummyCartItem } from "@/utils/";
 
 vi.mock("@/composables/useToast", () => ({
   default: () => ({
@@ -58,10 +57,10 @@ describe("AppHeader", () => {
   });
 
   it("displays the cart count when there are items in the cart", async () => {
-    const { addItemToCart, getNextItemId } = useCart();
-    await addItemToCart(createDummyCartItem(getNextItemId()));
-    await addItemToCart(createDummyCartItem(getNextItemId()));
-    await addItemToCart(createDummyCartItem(getNextItemId()));
+    const { addDemoItemToCart } = useCart();
+    await addDemoItemToCart();
+    await addDemoItemToCart();
+    await addDemoItemToCart();
 
     await renderWithRouter(AppHeader);
     const cartLink = screen.getByRole("link", { name: /cart/i });

@@ -48,13 +48,13 @@
           </div>
           <CartActions
             class="absolute inset-x-0 bottom-0 z-10 bg-white/75 backdrop-blur-md"
-            @addItem="addItemToCart(createDummyCartItem(getNextItemId()))"
+            @addItem="addDemoItemToCart"
             @clearCart="clearCart"
           />
         </div>
         <CartEmptyState
           v-else
-          @addItem="addItemToCart(createDummyCartItem(getNextItemId()))"
+          @addItem="addDemoItemToCart"
         />
       </div>
     </div>
@@ -71,18 +71,16 @@ import CartActions from "@/components/cart/CartActions.vue";
 import CartShippingCostCalculator from "@/components/cart/CartShippingCostCalculator.vue";
 import CartLoadingState from "@/components/cart/CartLoadingState.vue";
 import CartEmptyState from "@/components/cart/CartEmptyState.vue";
-import { createDummyCartItem } from "@/utils/cart.ts";
 
 const {
   cartItems,
   isFetching,
   hasInitializedCart,
   fetchCartItems,
-  addItemToCart,
+  addDemoItemToCart,
   clearCart,
   updateItemQuantity,
   removeItemFromCart,
-  getNextItemId,
 } = useCart();
 
 onMounted(() => {

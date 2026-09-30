@@ -5,7 +5,7 @@ import {
   FETCH_CART_ITEMS_URL,
   ADD_ITEM_TO_CART_URL,
 } from "@/consts";
-import { clampCartQuantity } from "@/utils";
+import { clampCartQuantity, createDummyCartItem } from "@/utils/cart";
 import useApi from "./useApi";
 import useToast from "./useToast";
 
@@ -143,6 +143,10 @@ export default function useCart() {
     item.quantity = clampCartQuantity(quantity);
   };
 
+  const addDemoItemToCart = async () => {
+    await addItemToCart(createDummyCartItem(getNextItemId()));
+  };
+
   return {
     summary: readonly(summary),
     cartItems: readonly(cartItems),
@@ -157,6 +161,6 @@ export default function useCart() {
     emptyCart,
     clearCart,
     resetCartState,
-    getNextItemId,
+    addDemoItemToCart,
   };
 }
