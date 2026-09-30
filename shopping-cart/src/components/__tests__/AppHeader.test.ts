@@ -3,9 +3,9 @@ import { cleanup, screen, waitFor } from "@testing-library/vue";
 import AppHeader from "../base/AppHeader.vue";
 import { renderWithRouter } from "@/test/utils.ts";
 import userEvent from "@testing-library/user-event";
-import useCart from "@/composables/useCart.ts";
+import { useCart } from "@/composables";
 import { DEFAULT_ROUTE } from "@/consts";
-import { createDummyCartItem } from "@/utils/cart.ts";
+import { createDummyCartItem } from "@/utils/";
 
 vi.mock("@/composables/useToast", () => ({
   default: () => ({

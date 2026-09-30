@@ -1,5 +1,20 @@
 import type { CartItem } from "@/types";
-import { DUMMY_CART_ITEM_UNIT_PRICE } from "@/consts";
+import {
+  DUMMY_CART_ITEM_UNIT_PRICE,
+  MAX_QUANTITY,
+  MIN_QUANTITY,
+} from "@/consts";
+
+export function clampCartQuantity(
+  value: number,
+  min = MIN_QUANTITY,
+  max = MAX_QUANTITY,
+): number {
+  if (!Number.isFinite(value)) {
+    return min;
+  }
+  return Math.min(max, Math.max(min, Math.floor(value)));
+}
 
 export const createDummyCartItem = (id: number): Omit<CartItem, "id"> => {
   return {

@@ -69,7 +69,6 @@ describe("QuantitySelector", () => {
     renderQuantitySelector(MAX_QUANTITY - 1);
 
     const inputField = screen.getByRole("spinbutton");
-    ``;
     const incrementButton = screen.getByTestId("increment-quantity-button");
     const user = userEvent.setup();
 

@@ -5,11 +5,22 @@ import { createDummyCartItem } from "@/utils/cart";
 import {
   DUMMY_CART_ITEM_UNIT_PRICE,
   MAX_CART_ITEMS,
+  MAX_QUANTITY,
+  MIN_QUANTITY,
   STANDARD_TAX_RATE,
 } from "@/consts";
-import type { CartSummary } from "@/types";
+import type { CartItem, CartSummary } from "@/types";
 
 type UseCartReturn = ReturnType<typeof useCart>;
+
+// DummyJSON's POST /products/add always echoes back this same id,
+// which is why the store assigns its own id instead.
+const API_ADD_ITEM_RESPONSE_ID = 195;
+
+const createDummyProduct = (id: number): CartItem => ({
+  ...createDummyCartItem(id),
+  id,
+});
 
 function mockFetchWithDummyItems(count: number) {
   vi.stubGlobal(
@@ -19,10 +30,10 @@ function mockFetchWithDummyItems(count: number) {
         ok: true,
         json: async () =>
           init?.method?.toUpperCase() === "POST"
-            ? createDummyCartItem(count + 1)
+            ? createDummyProduct(API_ADD_ITEM_RESPONSE_ID)
             : {
                 products: Array.from({ length: count }, (_, i) =>
-                  createDummyCartItem(i + 1),
+                  createDummyProduct(i + 1),
                 ),
               },
       }),
@@ -122,6 +133,23 @@ describe("useCart composable", () => {
     );
   });
 
+  it("clamps quantity when updating item quantity", async () => {
+    const { updateItemQuantity, cartItems } = await seedCart(5);
+
+    updateItemQuantity(1, MAX_QUANTITY + 100);
+    expect(cartItems.value.find((item) => item.id === 1)?.quantity).toBe(
+      MAX_QUANTITY,
+    );
+
+    updateItemQuantity(1, MIN_QUANTITY - 5);
+    expect(cartItems.value.find((item) => item.id === 1)?.quantity).toBe(
+      MIN_QUANTITY,
+    );
+
+    updateItemQuantity(999, 5);
+    expect(cartItems.value.find((item) => item.id === 999)).toBeUndefined();
+  });
+
   // 5. remove item from cart, assert totals are correctly updated
   it("remove item from cart, assert totals are correctly updated", async () => {
     const { summary, removeItemFromCart, cartItems } = await seedCart(5);
@@ -135,7 +163,19 @@ describe("useCart composable", () => {
     );
   });
 
-  // 6. clear cart, assert totals are correctly updated
+  // 6. added items always get a unique id, even after a removal
+  it("assigns a unique id to added items after a removal", async () => {
+    const { cartItems, addItemToCart, removeItemFromCart } = await seedCart(5);
+
+    await removeItemFromCart(3);
+    await addItemToCart(createDummyCartItem(6));
+
+    const ids = cartItems.value.map((item) => item.id);
+    expect(new Set(ids).size).toEqual(ids.length);
+    expect(ids.at(-1)).toEqual(6);
+  });
+
+  // 7. clear cart, assert totals are correctly updated
   it("clear cart, assert totals are correctly updated", async () => {
     const { summary, clearCart, cartItems } = await seedCart(5);
 

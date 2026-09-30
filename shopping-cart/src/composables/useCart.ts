@@ -5,6 +5,7 @@ import {
   FETCH_CART_ITEMS_URL,
   ADD_ITEM_TO_CART_URL,
 } from "@/consts";
+import { clampCartQuantity } from "@/utils";
 import useApi from "./useApi";
 import useToast from "./useToast";
 
@@ -59,13 +60,14 @@ export default function useCart() {
             images: item.images,
             quantity: item.quantity ?? 1,
           }));
+          hasInitializedCart.value = true;
         },
       });
     } catch (error) {
       console.error(error);
+      hasInitializedCart.value = false;
     } finally {
       isFetching.value = false;
-      hasInitializedCart.value = true;
     }
   };
 
@@ -130,9 +132,15 @@ export default function useCart() {
   };
 
   const updateItemQuantity = (id: number, quantity: number) => {
-    cartItems.value = cartItems.value.map((item) =>
-      item.id === id ? { ...item, quantity } : item,
-    );
+    const itemIndex = cartItems.value.findIndex((item) => item.id === id);
+    if (itemIndex === -1) {
+      return;
+    }
+    const item = cartItems.value[itemIndex];
+    if (!item) {
+      return;
+    }
+    item.quantity = clampCartQuantity(quantity);
   };
 
   return {

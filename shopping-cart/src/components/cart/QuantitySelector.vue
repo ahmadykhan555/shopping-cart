@@ -2,13 +2,16 @@
   <div
     class="inline-flex h-9 w-30 shrink-0 items-center overflow-hidden rounded-md bg-gray-100"
   >
-    <button
+    <AppButton
+      type="button"
+      variant="ghost"
       data-testid="decrement-quantity-button"
+      aria-label="Decrease quantity"
+      class="flex h-full w-9 shrink-0 items-center justify-center text-lg font-normal leading-none text-gray-500 transition-colors hover:bg-gray-200/80 active:bg-gray-200"
       @click="handleUpdateQuantityOnClick('decrement')"
-      class="flex h-full w-9 shrink-0 cursor-pointer items-center justify-center bg-transparent text-lg font-normal leading-none text-gray-500 transition-colors hover:bg-gray-200/80 active:bg-gray-200"
     >
       -
-    </button>
+    </AppButton>
     <input
       type="number"
       v-model.number="selectedQuantity"
@@ -18,18 +21,23 @@
       @blur="handleUpdateQuantityByUserInput"
       @keydown.enter="handleUpdateQuantityByUserInput"
     />
-    <button
+    <AppButton
+      type="button"
+      variant="ghost"
       data-testid="increment-quantity-button"
+      aria-label="Increase quantity"
+      class="flex h-full w-9 shrink-0 items-center justify-center text-lg font-normal leading-none text-gray-500 transition-colors hover:bg-gray-200/80 active:bg-gray-200"
       @click="handleUpdateQuantityOnClick('increment')"
-      class="flex h-full w-9 shrink-0 cursor-pointer items-center justify-center bg-transparent text-lg font-normal leading-none text-gray-500 transition-colors hover:bg-gray-200/80 active:bg-gray-200"
     >
       +
-    </button>
+    </AppButton>
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { MIN_QUANTITY, MAX_QUANTITY } from "@/consts";
+import { clampCartQuantity } from "@/utils";
+import AppButton from "../base/AppButton.vue";
 
 const props = withDefaults(
   defineProps<{
@@ -48,15 +56,8 @@ const emit = defineEmits<{
   (e: "update:quantity", quantity: number): void;
 }>();
 
-const sanitizeInput = (value: number) => {
-  if (value < props.minQuantity) {
-    return props.minQuantity;
-  }
-  if (value > props.maxQuantity) {
-    return props.maxQuantity;
-  }
-  return Math.floor(value);
-};
+const sanitizeInput = (value: number) =>
+  clampCartQuantity(value, props.minQuantity, props.maxQuantity);
 
 const selectedQuantity = ref(sanitizeInput(props.quantity));
 
@@ -73,4 +74,13 @@ const handleUpdateQuantityByUserInput = () => {
   selectedQuantity.value = sanitizeInput(selectedQuantity.value);
   emit("update:quantity", selectedQuantity.value);
 };
+
+watch(
+  () => props.quantity,
+  (newValue) => {
+    if (newValue !== selectedQuantity.value) {
+      selectedQuantity.value = sanitizeInput(newValue);
+    }
+  },
+);
 </script>

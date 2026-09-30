@@ -2,9 +2,8 @@ import { cleanup, render, screen } from "@testing-library/vue";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import CartSummary from "../cart/CartSummary.vue";
 import useCart from "@/composables/useCart.ts";
-import { formatMoney } from "@/utils/index.ts";
-import { createDummyCartItem } from "@/utils/cart.ts";
-import { STANDARD_TAX_RATE } from "@/consts/index.ts";
+import { createDummyCartItem, formatMoney } from "@/utils";
+import { STANDARD_TAX_RATE } from "@/consts";
 
 vi.stubGlobal(
   "fetch",
