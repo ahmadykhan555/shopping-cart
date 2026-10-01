@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -e
 
-# Run from app root (this file: <git-root>/shopping-cart/.husky/pre-push).
+# Run from repo root (this file: <git-root>/.husky/pre-push).
 cd "$(dirname "$0")/.." || exit 1
 
 pnpm run lint:fix
