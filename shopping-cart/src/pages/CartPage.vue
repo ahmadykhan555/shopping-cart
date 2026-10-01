@@ -30,6 +30,8 @@
           class="mt-4 lg:mt-6"
           collapsible
           initial-collapsed
+          :shipping-cost="summary.shippingCost"
+          @update:shipping-cost="saveShippingCost"
         />
       </aside>
 
@@ -89,6 +91,7 @@ const {
   updateItemQuantity,
   removeItemFromCart,
   isAddingItemToCart,
+  saveShippingCost,
   emptyCart,
 } = useCart();
 

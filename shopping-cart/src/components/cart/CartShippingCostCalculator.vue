@@ -22,12 +22,12 @@
     </AppButton>
 
     <div
-      v-if="summary.shippingCost > 0"
+      v-if="shippingCost > 0"
       class="mt-3 flex items-center justify-between border-t border-gray-200 pt-3"
     >
       <span class="text-sm text-gray-600">Estimated shipping</span>
       <span class="text-base font-semibold tabular-nums text-gray-900">
-        {{ formatMoney(summary.shippingCost) }}
+        {{ formatMoney(shippingCost) }}
       </span>
     </div>
 
@@ -92,7 +92,7 @@
 <script setup lang="ts">
 import { reactive, ref } from "vue";
 import AppButton from "../base/AppButton.vue";
-import { useCart, useFormValidation } from "@/composables";
+import { useFormValidation } from "@/composables";
 import type { FormFieldRules } from "@/types";
 import { calculateRandomShippingCost, formatMoney } from "@/utils";
 
@@ -106,14 +106,20 @@ type FieldKey = keyof ShippingForm;
 
 const props = withDefaults(
   defineProps<{
+    shippingCost?: number;
     collapsible?: boolean;
     initialCollapsed?: boolean;
   }>(),
   {
+    shippingCost: 0,
     collapsible: false,
     initialCollapsed: true,
   },
 );
+
+const emit = defineEmits<{
+  "update:shippingCost": [cost: number];
+}>();
 
 const form = reactive<ShippingForm>({
   origin: "Stuttgart",
@@ -177,7 +183,6 @@ const { errors, markTouched, validateForm, isValid } = useFormValidation(
   fieldRules,
 );
 
-const { summary, saveShippingCost } = useCart();
 const isCollapsed = ref(props.initialCollapsed);
 
 const toggleCollapsed = () => {
@@ -191,6 +196,6 @@ const handleCalculateShipping = () => {
   if (!validateForm()) {
     return;
   }
-  saveShippingCost(calculateRandomShippingCost());
+  emit("update:shippingCost", calculateRandomShippingCost());
 };
 </script>

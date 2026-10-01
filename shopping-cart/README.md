@@ -115,8 +115,8 @@ src/
 
 Cart data is centralized in **`useCart`** (shared composable state). Components use two patterns, depending on depth:
 
-- **Direct composable access** — `AppHeader`, `CartSummary`, and `CartShippingCostCalculator` call `useCart()` for totals, flags, or mutations without prop drilling through `CartPage`.
-- **Props down, events up** — `CartPage` passes each line as an `item` prop to `CartItem`, passes disabled flags to `CartActions`, wires `@updateItemQuantity`, `@click:removeItem`, `@addItem`, `@clearCart`, and `@click:checkout` (router navigation + `emptyCart`) to `useCart` / the router. `QuantitySelector` stays presentational (quantity in, `update:quantity` out).
+- **Direct composable access** — `AppHeader` and `CartSummary` call `useCart()` for totals and flags without prop drilling through `CartPage`.
+- **Props down, events up** — `CartPage` passes each line as an `item` prop to `CartItem`, passes disabled flags to `CartActions`, passes `shippingCost` to `CartShippingCostCalculator`, and wires `@updateItemQuantity`, `@click:removeItem`, `@addItem`, `@clearCart`, `@update:shippingCost` → `saveShippingCost`, and `@click:checkout` (router navigation + `emptyCart`) to `useCart` / the router. `QuantitySelector` stays presentational (quantity in, `update:quantity` out).
 
 `CartPage` owns route-level orchestration (fetch on mount, layout, loading/empty vs list). Leaf UI stays testable; sidebar and header read the same reactive cart as the list.
 
@@ -137,7 +137,7 @@ Cart data is centralized in **`useCart`** (shared composable state). Components 
 - **`CartActions`** — Add item and clear cart (sticky footer on list view)
 - **`CartSummary`** — Subtotal, shipping, tax, total; emits `click:checkout` with order state; collapsible on small screens
 - **`CartSummaryItem`** — Summary row (also used on checkout success)
-- **`CartShippingCostCalculator`** — Shipping form, validation, save cost to cart state
+- **`CartShippingCostCalculator`** — Shipping form, validation; emits `update:shippingCost` with calculated cost
 
 **Pages** (`src/pages/`)
 
@@ -206,6 +206,7 @@ The task asks for checkout as a simple confirmation, not payment processing. The
 | ----------- | ---------------------------------------------------------------------------------------------------------------- |
 | Cart logic  | `src/composables/__tests__/useCart.test.ts` — totals, quantity clamp, shipping, fetch/add failure, id assignment |
 | HTTP helper | `src/composables/__tests__/useApi.test.ts` — success path, errors, toasts                                        |
+| Form validation | `src/composables/__tests__/useFormValidation.test.ts` — touch/submit gating, required and custom rules       |
 | UI          | `src/components/__tests__/` — `CartSummary`, `CartActions`, `AppHeader`, `QuantitySelector`, `AppButton`           |
 
 Use **`pnpm run test:run`** for a single pass, **`pnpm run test`** for watch mode, or **`pnpm run test:coverage`** for coverage.
