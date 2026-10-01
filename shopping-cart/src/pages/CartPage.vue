@@ -6,9 +6,9 @@
       >
         Your cart
       </h1>
-      <p v-if="cartItems.length" class="mt-2 text-sm text-gray-600">
-        {{ cartItems.length }}
-        {{ cartItems.length === 1 ? "item" : "items" }}
+      <p v-if="summary.count" class="mt-2 text-sm text-gray-600">
+        {{ summary.count }}
+        {{ summary.count === 1 ? "item" : "items" }}
       </p>
     </header>
 
@@ -74,6 +74,7 @@ import CartEmptyState from "@/components/cart/CartEmptyState.vue";
 
 const {
   cartItems,
+  summary,
   isFetching,
   hasInitializedCart,
   fetchCartItems,
