@@ -8,6 +8,7 @@
       data-testid="decrement-quantity-button"
       aria-label="Decrease quantity"
       class="flex h-full w-9 shrink-0 items-center justify-center text-lg font-normal leading-none text-gray-500 transition-colors hover:bg-gray-200/80 active:bg-gray-200"
+      :disabled="quantity === minQuantity"
       @click="handleUpdateQuantityOnClick('decrement')"
     >
       -
@@ -27,6 +28,7 @@
       data-testid="increment-quantity-button"
       aria-label="Increase quantity"
       class="flex h-full w-9 shrink-0 items-center justify-center text-lg font-normal leading-none text-gray-500 transition-colors hover:bg-gray-200/80 active:bg-gray-200"
+      :disabled="quantity === maxQuantity"
       @click="handleUpdateQuantityOnClick('increment')"
     >
       +
