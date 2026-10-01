@@ -1,6 +1,5 @@
 /**
- * Git root is one directory above this package (see README). Husky’s default
- * installer expects .git in cwd, so we point the parent repo at shopping-cart/.husky.
+ * Point this repo’s git hooks at .husky (same directory as package.json).
  */
 import { execFileSync } from "node:child_process";
 import { chmodSync, existsSync } from "node:fs";
@@ -8,18 +7,16 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const appRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
-const gitRoot = join(appRoot, "..");
-/** Relative to git root (parent of appRoot). */
-const hooksDir = "shopping-cart/.husky";
+const hooksDir = ".husky";
 const prePushHook = join(appRoot, ".husky", "pre-push");
 
-if (!existsSync(join(gitRoot, ".git"))) {
+if (!existsSync(join(appRoot, ".git"))) {
   console.warn("husky: skipping hook setup (.git not found)");
   process.exit(0);
 }
 
 execFileSync("git", ["config", "core.hooksPath", hooksDir], {
-  cwd: gitRoot,
+  cwd: appRoot,
   stdio: "inherit",
 });
 
