@@ -1,6 +1,6 @@
 <template>
   <article
-    class="w-full min-w-0 border-b border-gray-100 py-6 md:col-span-full xl:grid xl:grid-cols-subgrid xl:items-center"
+    class="max-xl:relative w-full min-w-0 border-b border-gray-100 py-6 md:col-span-full xl:grid xl:grid-cols-subgrid xl:items-center"
   >
     <div class="flex min-w-0 items-center gap-4">
       <div
@@ -31,15 +31,20 @@
         </p>
       </div>
     </div>
-    <p class="text-base font-medium tabular-nums text-gray-900">
+    <p
+      class="text-sm xl:text-base font-medium max-xl:mt-2 max-xl:mb-7 tabular-nums text-gray-900"
+    >
       {{ formatMoney(item.price) }}
+      <span class="max-xl:inline hidden text-xs text-gray-500">/ item</span>
     </p>
     <QuantitySelector
       class="justify-self-start self-center"
       :quantity="item.quantity"
       @update:quantity="emit('updateItemQuantity', item.id, $event)"
     />
-    <p class="text-right text-base font-medium tabular-nums text-gray-900">
+    <p
+      class="text-right text-base font-medium tabular-nums text-gray-900 max-xl:absolute max-xl:right-0 max-xl:bottom-7"
+    >
       {{ formatMoney(item.price * item.quantity) }}
     </p>
   </article>

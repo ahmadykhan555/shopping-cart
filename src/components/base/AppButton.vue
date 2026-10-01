@@ -24,7 +24,7 @@ const buttonClasses = computed(() => {
     return [
       "inline-flex cursor-pointer items-center border-0 bg-transparent p-0 font-inherit text-inherit shadow-none outline-none",
       "rounded-none ring-0",
-      props.disabled ? "cursor-not-allowed opacity-50" : "",
+      props.disabled ? "cursor-not-allowed! opacity-50" : "",
     ];
   }
 
@@ -36,7 +36,7 @@ const buttonClasses = computed(() => {
       "bg-red-500": props.variant === "danger",
       "bg-purple-500": props.variant === "link",
     },
-    props.disabled ? "cursor-not-allowed opacity-50" : "",
+    props.disabled ? "cursor-not-allowed! opacity-50!" : "",
   ];
 });
 </script>
