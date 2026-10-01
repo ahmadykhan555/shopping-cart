@@ -1,5 +1,7 @@
 <template>
-  <div class="mt-6 rounded-xl border border-gray-200 bg-gray-50/50 p-6">
+  <div
+    class="mt-6 rounded-xl border border-gray-200 bg-gray-50/50 max-md:p-4 p-6"
+  >
     <AppButton
       type="button"
       aria-label="Toggle shipping calculator"

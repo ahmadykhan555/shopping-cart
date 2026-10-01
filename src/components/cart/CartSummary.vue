@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-xl border border-gray-200 bg-gray-50/50 p-6">
+  <div class="rounded-xl border border-gray-200 bg-gray-50/50 max-md:p-4 p-6">
     <AppButton
       aria-label="Toggle order summary"
       v-if="collapsible"
