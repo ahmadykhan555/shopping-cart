@@ -1,6 +1,7 @@
 export const DEFAULT_ROUTE = "/cart";
-export enum APP_ROUTES {
-  DEFAULT = "/cart",
-  CART = "/cart",
-  CHECKOUT_SUCCESS = "/checkout-success",
-}
+
+export const APP_ROUTES = {
+  DEFAULT: DEFAULT_ROUTE,
+  CART: DEFAULT_ROUTE,
+  CHECKOUT_SUCCESS: "/checkout-success",
+} as const;

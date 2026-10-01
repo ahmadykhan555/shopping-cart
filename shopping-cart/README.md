@@ -57,6 +57,8 @@ Cart state lives in a shared composable (see [Technical decisions](#technical-de
 
 ## How to run
 
+**Repository layout:** The Git root is the **parent** folder (`…/shopping-cart/`); this Vue app and `package.json` live in the nested `shopping-cart/` directory. Run all commands below from that nested folder.
+
 Requires **Node.js ≥ 20** (see `.nvmrc`).
 
 ```bash
@@ -66,6 +68,9 @@ pnpm run dev          # http://localhost:5173
 pnpm run test         # Vitest watch mode (interactive)
 pnpm run test:run     # single run, exits (CI-friendly)
 pnpm run test:coverage
+pnpm run lint         # ESLint (Vue + TypeScript)
+pnpm run lint:fix     # ESLint with auto-fix
+pnpm install          # registers pre-push on the parent repo (lint:fix, then lint)
 pnpm run build        # vue-tsc + production bundle
 pnpm run preview      # serve production build locally
 ```
