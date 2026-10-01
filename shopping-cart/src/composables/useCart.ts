@@ -4,33 +4,44 @@ import {
   STANDARD_TAX_RATE,
   FETCH_CART_ITEMS_URL,
   ADD_ITEM_TO_CART_URL,
-  MAX_CART_ITEMS,
-  DUMMY_CART_ITEM_UNIT_PRICE,
 } from "@/consts";
+import { clampCartQuantity, createDummyCartItem } from "@/utils/cart";
 import useApi from "./useApi";
-import { createDummyCartItem } from "@/utils/cart";
-import { useToast } from "./useToast";
+import useToast from "./useToast";
 
 // data
 const cartItems = ref<CartItem[]>([]); // allows state sharing
 const isFetching = ref(false);
+const hasInitializedCart = ref(false);
 const summary = computed<CartSummary>(() => {
-  const total = cartItems.value.reduce(
+  const subTotal = cartItems.value.reduce(
     (acc, item) => acc + item.price * item.quantity,
     0,
   );
-  const tax = total * STANDARD_TAX_RATE;
+  const tax = subTotal * STANDARD_TAX_RATE;
   return {
-    total: Number(total.toFixed(2)),
+    subTotal: Number(subTotal.toFixed(2)),
     tax: Number(tax.toFixed(2)),
     count: cartItems.value.length,
-    totalWithTax: Number((total + tax).toFixed(2)),
+    shippingCost: Number(shippingCost.value.toFixed(2)),
+    total: Number((subTotal + tax + shippingCost.value).toFixed(2)),
   };
 });
+const shippingCost = ref(0);
+const isAddingItemToCart = ref(false);
+
+const getNextItemId = () => {
+  return (
+    cartItems.value.reduce(
+      (maxId, cartItem) => Math.max(maxId, cartItem.id),
+      0,
+    ) + 1
+  );
+};
 
 export default function useCart() {
   const { apiCall } = useApi();
-  const { success } = useToast();
+  const { showSuccessToast } = useToast();
 
   // methods
   const fetchCartItems = async () => {
@@ -49,51 +60,107 @@ export default function useCart() {
             images: item.images,
             quantity: item.quantity ?? 1,
           }));
+          hasInitializedCart.value = true;
         },
       });
     } catch (error) {
       console.error(error);
+      hasInitializedCart.value = false;
     } finally {
       isFetching.value = false;
     }
   };
 
   const addItemToCart = async (item: Omit<CartItem, "id">) => {
-    debugger;
-    await apiCall<CartItem>({
-      url: ADD_ITEM_TO_CART_URL,
-      options: {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...item, id: undefined }),
-      },
-      onSuccess: (item) => {
-        cartItems.value.push({ ...item, quantity: item.quantity ?? 1 });
-        success(`"${item.title}" added to cart`);
-      },
-    });
+    if (isAddingItemToCart.value) return;
+    isAddingItemToCart.value = true;
+    try {
+      await apiCall<CartItem>({
+        url: ADD_ITEM_TO_CART_URL,
+        options: {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...item, id: undefined }),
+        },
+        onSuccess: (item) => {
+          cartItems.value.push({
+            ...item,
+            quantity: item.quantity ?? 1,
+            id: getNextItemId(), // API always sends the same id so we need to override it to a unique id
+          });
+          showSuccessToast(`"${item.title}" added to cart`);
+        },
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      isAddingItemToCart.value = false;
+    }
   };
 
   const removeItemFromCart = (id: number) => {
-    cartItems.value = cartItems.value.filter((item) => item.id !== id);
+    const itemToRemove = cartItems.value.find((item) => item.id === id);
+    if (!itemToRemove) {
+      return;
+    }
+    cartItems.value = cartItems.value.filter(
+      (item) => item.id !== itemToRemove.id,
+    );
+    showSuccessToast(`"${itemToRemove.title}" removed from cart`);
   };
 
-  const clearCart = () => (cartItems.value = []);
+  const saveShippingCost = (cost: number) => {
+    if (!Number.isFinite(cost) || cost < 0) return;
+    shippingCost.value = Number(cost.toFixed(2));
+  };
+
+  const emptyCart = () => {
+    cartItems.value = [];
+    shippingCost.value = 0;
+  };
+
+  const clearCart = () => {
+    emptyCart();
+    showSuccessToast("Cart Emptied");
+  };
+
+  const resetCartState = () => {
+    emptyCart();
+    isFetching.value = false;
+    hasInitializedCart.value = false;
+    isAddingItemToCart.value = false;
+  };
 
   const updateItemQuantity = (id: number, quantity: number) => {
-    cartItems.value = cartItems.value.map((item) =>
-      item.id === id ? { ...item, quantity } : item,
-    );
+    const itemIndex = cartItems.value.findIndex((item) => item.id === id);
+    if (itemIndex === -1) {
+      return;
+    }
+    const item = cartItems.value[itemIndex];
+    if (!item) {
+      return;
+    }
+    item.quantity = clampCartQuantity(quantity);
+  };
+
+  const addDemoItemToCart = async () => {
+    await addItemToCart(createDummyCartItem(getNextItemId()));
   };
 
   return {
     summary: readonly(summary),
     cartItems: readonly(cartItems),
     isFetching: readonly(isFetching),
+    isAddingItemToCart: readonly(isAddingItemToCart),
+    hasInitializedCart: readonly(hasInitializedCart),
     fetchCartItems,
     addItemToCart,
     removeItemFromCart,
-    clearCart,
     updateItemQuantity,
+    saveShippingCost,
+    emptyCart,
+    clearCart,
+    resetCartState,
+    addDemoItemToCart,
   };
 }

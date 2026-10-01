@@ -1,16 +1,16 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
 import { cleanup, screen, waitFor } from "@testing-library/vue";
 import AppHeader from "../base/AppHeader.vue";
-import { renderWithRouter } from "@/test/utils.ts";
+import { renderWithRouter } from "@/test/utils";
 import userEvent from "@testing-library/user-event";
-import useCart from "@/composables/useCart.ts";
-import { createDummyCartItem } from "@/utils/cart.ts";
+import { useCart } from "@/composables";
+import { DEFAULT_ROUTE } from "@/consts";
 
 vi.mock("@/composables/useToast", () => ({
-  useToast: () => ({
-    success: vi.fn(),
-    error: vi.fn(),
-    info: vi.fn(),
+  default: () => ({
+    showSuccessToast: vi.fn(),
+    showErrorToast: vi.fn(),
+    showInfoToast: vi.fn(),
   }),
 }));
 
@@ -22,7 +22,7 @@ beforeEach(() => {
       json: async () => ({}),
     }),
   );
-  useCart().clearCart();
+  useCart().resetCartState();
 });
 
 afterEach(() => {
@@ -31,36 +31,36 @@ afterEach(() => {
 });
 
 describe("AppHeader", () => {
-  it("renders links to home and cart pages", async () => {
+  it("renders logo and cart links", async () => {
     await renderWithRouter(AppHeader);
-    const homeLink = screen.getByRole("link", { name: "Home" });
-    expect(homeLink).toBeInTheDocument();
-    const cartLink = screen.getByRole("link", { name: "Cart" });
-    expect(cartLink).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Neuffer" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Cart" })).toBeInTheDocument();
   });
 
-  it("navigates to correct page when home and cart links are clicked", async () => {
-    const { router } = await renderWithRouter(AppHeader);
+  it("navigates to cart when logo or cart link is clicked", async () => {
+    const { router } = await renderWithRouter(AppHeader, "/checkout/success");
     const user = userEvent.setup();
+
+    await user.click(screen.getByTestId("site-logo"));
+    await waitFor(() => {
+      expect(router.currentRoute.value.path).toBe(DEFAULT_ROUTE);
+    });
+
+    await router.push("/checkout/success");
+    await router.isReady();
 
     const cartLink = screen.getByRole("link", { name: "Cart" });
     await user.click(cartLink);
     await waitFor(() => {
-      expect(router.currentRoute.value.path).toBe("/cart");
-    });
-
-    const homeLink = screen.getByRole("link", { name: "Home" });
-    await user.click(homeLink);
-    await waitFor(() => {
-      expect(router.currentRoute.value.path).toBe("/");
+      expect(router.currentRoute.value.path).toBe(DEFAULT_ROUTE);
     });
   });
 
   it("displays the cart count when there are items in the cart", async () => {
-    const { addItemToCart } = useCart();
-    await addItemToCart(createDummyCartItem(1));
-    await addItemToCart(createDummyCartItem(2));
-    await addItemToCart(createDummyCartItem(3));
+    const { addDemoItemToCart } = useCart();
+    await addDemoItemToCart();
+    await addDemoItemToCart();
+    await addDemoItemToCart();
 
     await renderWithRouter(AppHeader);
     const cartLink = screen.getByRole("link", { name: /cart/i });

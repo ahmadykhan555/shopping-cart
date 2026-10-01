@@ -5,10 +5,10 @@ import { DEFAULT_API_OPTIONS } from "@/consts";
 const mockToastError = vi.fn();
 
 vi.mock("@/composables/useToast", () => ({
-  useToast: () => ({
-    success: vi.fn(),
-    error: mockToastError,
-    info: vi.fn(),
+  default: () => ({
+    showSuccessToast: vi.fn(),
+    showErrorToast: mockToastError,
+    showInfoToast: vi.fn(),
   }),
 }));
 

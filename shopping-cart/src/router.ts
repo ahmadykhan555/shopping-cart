@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { APP_ROUTES } from "@/consts";
 
 const APP_TITLE = "Neuffer";
 
@@ -6,24 +7,27 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
-      name: "home",
       path: "/",
-      component: () => import("./pages/HomePage.vue"),
-      meta: { title: "Home" },
+      redirect: APP_ROUTES.DEFAULT,
     },
     {
       name: "cart",
-      path: "/cart",
+      path: APP_ROUTES.CART,
       component: () => import("./pages/CartPage.vue"),
       meta: { title: "Cart" },
     },
     {
       name: "checkout-success",
-      path: "/checkout/success",
+      path: APP_ROUTES.CHECKOUT_SUCCESS,
       component: () => import("./pages/CheckoutSuccessPage.vue"),
       meta: { title: "Order success" },
     },
     // todo add catch all for 404
+    {
+      name: "not-found",
+      path: "/:pathMatch(.*)*",
+      redirect: APP_ROUTES.DEFAULT,
+    },
   ],
 });
 

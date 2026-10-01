@@ -1,6 +1,6 @@
 import { DEFAULT_API_OPTIONS } from "@/consts";
 import { ADD_ITEM_TO_CART_URL, FETCH_CART_ITEMS_URL } from "@/consts";
-import { useToast } from "./useToast";
+import useToast from "./useToast";
 
 const DEFAULT_API_ERROR_MESSAGE = "Something went wrong. Please try again.";
 
@@ -21,8 +21,8 @@ type ApiCallParams<T> = {
 };
 
 export default function useApi() {
-  const { error: showErrorToast } = useToast();
-  // todo accept params as object
+  const { showErrorToast } = useToast();
+
   const apiCall = async <T>({
     url,
     options = DEFAULT_API_OPTIONS,

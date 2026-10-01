@@ -2,8 +2,8 @@
   <header class="flex items-center justify-between gap-12">
     <RouterLink
       class="inline-flex items-center"
-      :to="{ name: 'home' }"
-      aria-label="Home"
+      :to="{ name: 'cart' }"
+      aria-label="Neuffer"
     >
       <img
         :src="logo"
@@ -32,7 +32,7 @@
 <script setup lang="ts">
 import logo from "@/assets/logo.svg";
 import CartIcon from "@/assets/icons/CartIcon.vue";
-import useCart from "@/composables/useCart";
+import { useCart } from "@/composables";
 
 const { cartItems } = useCart();
 </script>

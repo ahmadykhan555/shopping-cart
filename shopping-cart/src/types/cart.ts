@@ -9,8 +9,9 @@ export type CartItem = {
 };
 
 export type CartSummary = {
-  total: number;
+  subTotal: number;
+  shippingCost: number;
   tax: number;
   count: number;
-  totalWithTax: number;
+  total: number;
 };

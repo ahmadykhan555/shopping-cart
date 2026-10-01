@@ -6,6 +6,7 @@
       variant="secondary"
       aria-label="Add item to cart"
       @click="$emit('addItem')"
+      :disabled="isAddingItemToCart"
     >
       Add item
     </AppButton>
@@ -21,10 +22,10 @@
 </template>
 
 <script setup lang="ts">
-import useCart from "@/composables/useCart";
+import { useCart } from "@/composables";
 import AppButton from "../base/AppButton.vue";
 
 defineEmits(["addItem", "clearCart"]);
 
-const { cartItems } = useCart();
+const { cartItems, isAddingItemToCart } = useCart();
 </script>

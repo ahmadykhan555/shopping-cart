@@ -69,7 +69,6 @@ describe("QuantitySelector", () => {
     renderQuantitySelector(MAX_QUANTITY - 1);
 
     const inputField = screen.getByRole("spinbutton");
-    ``;
     const incrementButton = screen.getByTestId("increment-quantity-button");
     const user = userEvent.setup();
 
@@ -86,6 +85,7 @@ describe("QuantitySelector", () => {
 
     const user = userEvent.setup();
     await user.type(inputField, "10");
+    await inputField.blur();
 
     expect(inputField).toHaveValue(10);
     expect(emitted()["update:quantity"]!.at(-1)).toEqual([10]);
@@ -96,12 +96,14 @@ describe("QuantitySelector", () => {
     const inputField = screen.getByRole("spinbutton");
     const user = userEvent.setup();
     await user.type(inputField, "11");
+    await inputField.blur();
     expect(inputField).toHaveValue(MAX_QUANTITY);
   });
   it("sanitizes input in user types a value les than min quantity", async () => {
     renderQuantitySelector(1);
     const inputField = screen.getByRole("spinbutton");
     await fireEvent.update(inputField, "-10");
+    await fireEvent.blur(inputField);
     expect(inputField).toHaveValue(MIN_QUANTITY);
   });
 });

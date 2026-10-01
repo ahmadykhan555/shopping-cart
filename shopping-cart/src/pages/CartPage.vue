@@ -12,9 +12,7 @@
       </p>
     </header>
 
-    <div v-if="isFetching" class="py-12 text-sm text-gray-600">
-      Loading cart…
-    </div>
+    <CartLoadingState v-if="isFetching" />
 
     <div
       v-else
@@ -37,33 +35,27 @@
           class="relative max-h-[calc(100vh-20rem)] w-full min-w-0"
         >
           <div
-            class="h-full max-h-[calc(100vh-20rem)] overflow-y-auto pb-[4.75rem] md:grid md:grid-cols-[minmax(0,1fr)_7rem_8rem_7rem] md:gap-x-6"
+            class="h-full max-h-[calc(100vh-20rem)] overflow-y-auto px-0.5 pb-19 md:grid md:grid-cols-[minmax(0,1fr)_7rem_8rem_7rem] md:gap-x-6"
           >
-            <CartItemsColumnHeaders class="max-md:hidden" />
+            <CartItemsColumnHeaders class="max-xl:hidden" />
             <CartItem
               v-for="item in cartItems"
               :key="item.id"
               :item="item"
-              @click:updateItemQuantity="updateItemQuantity"
+              @updateItemQuantity="updateItemQuantity"
               @click:removeItem="removeItemFromCart"
             />
           </div>
           <CartActions
             class="absolute inset-x-0 bottom-0 z-10 bg-white/75 backdrop-blur-md"
-            @addItem="addItemToCart(createDummyCartItem(cartItems.length + 1))"
+            @addItem="addDemoItemToCart"
             @clearCart="clearCart"
           />
         </div>
-        <template v-else>
-          <p class="py-12 text-sm text-gray-600">
-            No items in cart. Use “Add item” to add products.
-          </p>
-          <CartActions
-            class="mt-8"
-            @addItem="addItemToCart(createDummyCartItem(cartItems.length + 1))"
-            @clearCart="clearCart"
-          />
-        </template>
+        <CartEmptyState
+          v-else
+          @addItem="addDemoItemToCart"
+        />
       </div>
     </div>
   </div>
@@ -71,27 +63,28 @@
 
 <script setup lang="ts">
 import { onMounted } from "vue";
-import useCart from "@/composables/useCart";
+import { useCart } from "@/composables";
 import CartItem from "@/components/cart/CartItem.vue";
 import CartSummary from "@/components/cart/CartSummary.vue";
 import CartItemsColumnHeaders from "@/components/cart/CartItemsColumnHeaders.vue";
 import CartActions from "@/components/cart/CartActions.vue";
 import CartShippingCostCalculator from "@/components/cart/CartShippingCostCalculator.vue";
-import { createDummyCartItem } from "@/utils/cart.ts";
+import CartLoadingState from "@/components/cart/CartLoadingState.vue";
+import CartEmptyState from "@/components/cart/CartEmptyState.vue";
 
 const {
   cartItems,
-  fetchCartItems,
   isFetching,
-  addItemToCart,
+  hasInitializedCart,
+  fetchCartItems,
+  addDemoItemToCart,
   clearCart,
   updateItemQuantity,
   removeItemFromCart,
 } = useCart();
 
 onMounted(() => {
-  if (!isFetching.value && !cartItems.value.length) {
-    fetchCartItems();
-  }
+  if (isFetching.value || hasInitializedCart.value) return;
+  fetchCartItems();
 });
 </script>

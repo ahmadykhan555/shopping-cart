@@ -5,11 +5,22 @@ import { createDummyCartItem } from "@/utils/cart";
 import {
   DUMMY_CART_ITEM_UNIT_PRICE,
   MAX_CART_ITEMS,
+  MAX_QUANTITY,
+  MIN_QUANTITY,
   STANDARD_TAX_RATE,
 } from "@/consts";
-import type { CartSummary } from "@/types";
+import type { CartItem, CartSummary } from "@/types";
 
 type UseCartReturn = ReturnType<typeof useCart>;
+
+// DummyJSON's POST /products/add always echoes back this same id,
+// which is why the store assigns its own id instead.
+const API_ADD_ITEM_RESPONSE_ID = 195;
+
+const createDummyProduct = (id: number): CartItem => ({
+  ...createDummyCartItem(id),
+  id,
+});
 
 function mockFetchWithDummyItems(count: number) {
   vi.stubGlobal(
@@ -19,10 +30,10 @@ function mockFetchWithDummyItems(count: number) {
         ok: true,
         json: async () =>
           init?.method?.toUpperCase() === "POST"
-            ? createDummyCartItem(count + 1)
+            ? createDummyProduct(API_ADD_ITEM_RESPONSE_ID)
             : {
                 products: Array.from({ length: count }, (_, i) =>
-                  createDummyCartItem(i + 1),
+                  createDummyProduct(i + 1),
                 ),
               },
       }),
@@ -34,8 +45,8 @@ function assertSummaryFromSubtotal(
   summary: Readonly<Ref<CartSummary>>,
   expectedTotalWithoutTax: number,
 ) {
-  expect(summary.value.total).toEqual(expectedTotalWithoutTax);
-  expect(summary.value.totalWithTax).toEqual(
+  expect(summary.value.subTotal).toEqual(expectedTotalWithoutTax);
+  expect(summary.value.total).toEqual(
     expectedTotalWithoutTax * STANDARD_TAX_RATE + expectedTotalWithoutTax,
   );
 }
@@ -57,15 +68,15 @@ async function seedCart(count: number) {
 }
 
 vi.mock("@/composables/useToast", () => ({
-  useToast: () => ({
-    success: vi.fn(),
-    error: vi.fn(),
-    info: vi.fn(),
+  default: () => ({
+    showSuccessToast: vi.fn(),
+    showErrorToast: vi.fn(),
+    showInfoToast: vi.fn(),
   }),
 }));
 
 afterEach(() => {
-  useCart().clearCart();
+  useCart().resetCartState();
 });
 
 describe("useCart composable", () => {
@@ -73,10 +84,10 @@ describe("useCart composable", () => {
   it("initial cart state - empty cart", () => {
     const { cartItems, summary, isFetching } = useCart();
     expect(cartItems.value.length).toEqual(0);
-    expect(summary.value.total).toEqual(0);
+    expect(summary.value.subTotal).toEqual(0);
     expect(summary.value.tax).toEqual(0);
     expect(summary.value.count).toEqual(0);
-    expect(summary.value.totalWithTax).toEqual(0);
+    expect(summary.value.total).toEqual(0);
     expect(isFetching.value).toEqual(false);
   });
 
@@ -89,8 +100,8 @@ describe("useCart composable", () => {
       return acc;
     }, 0);
     const tax = totalWithoutTax * STANDARD_TAX_RATE;
-    expect(summary.value.total).toEqual(totalWithoutTax);
-    expect(summary.value.totalWithTax).toEqual(tax + totalWithoutTax);
+    expect(summary.value.subTotal).toEqual(totalWithoutTax);
+    expect(summary.value.total).toEqual(tax + totalWithoutTax);
   });
 
   // 3. add item to cart, assert totals are correctly updated
@@ -122,28 +133,57 @@ describe("useCart composable", () => {
     );
   });
 
+  it("clamps quantity when updating item quantity", async () => {
+    const { updateItemQuantity, cartItems } = await seedCart(5);
+
+    updateItemQuantity(1, MAX_QUANTITY + 100);
+    expect(cartItems.value.find((item) => item.id === 1)?.quantity).toBe(
+      MAX_QUANTITY,
+    );
+
+    updateItemQuantity(1, MIN_QUANTITY - 5);
+    expect(cartItems.value.find((item) => item.id === 1)?.quantity).toBe(
+      MIN_QUANTITY,
+    );
+
+    updateItemQuantity(999, 5);
+    expect(cartItems.value.find((item) => item.id === 999)).toBeUndefined();
+  });
+
   // 5. remove item from cart, assert totals are correctly updated
   it("remove item from cart, assert totals are correctly updated", async () => {
     const { summary, removeItemFromCart, cartItems } = await seedCart(5);
 
     expect(cartItems.value.length).toEqual(5);
-    const totalBeforeRemove = summary.value.total;
+    const totalBeforeRemove = summary.value.subTotal;
     await removeItemFromCart(1);
     expect(cartItems.value.length).toEqual(4);
-    expect(summary.value.total).toEqual(
+    expect(summary.value.subTotal).toEqual(
       totalBeforeRemove - DUMMY_CART_ITEM_UNIT_PRICE,
     );
   });
 
-  // 6. clear cart, assert totals are correctly updated
+  // 6. added items always get a unique id, even after a removal
+  it("assigns a unique id to added items after a removal", async () => {
+    const { cartItems, addItemToCart, removeItemFromCart } = await seedCart(5);
+
+    await removeItemFromCart(3);
+    await addItemToCart(createDummyCartItem(6));
+
+    const ids = cartItems.value.map((item) => item.id);
+    expect(new Set(ids).size).toEqual(ids.length);
+    expect(ids.at(-1)).toEqual(6);
+  });
+
+  // 7. clear cart, assert totals are correctly updated
   it("clear cart, assert totals are correctly updated", async () => {
     const { summary, clearCart, cartItems } = await seedCart(5);
 
     expect(cartItems.value.length).toEqual(5);
-    const totalBeforeClear = summary.value.total;
+    const totalBeforeClear = summary.value.subTotal;
     assertSummaryFromSubtotal(summary, totalBeforeClear);
     await clearCart();
     expect(cartItems.value.length).toEqual(0);
-    expect(summary.value.total).toEqual(0);
+    expect(summary.value.subTotal).toEqual(0);
   });
 });
