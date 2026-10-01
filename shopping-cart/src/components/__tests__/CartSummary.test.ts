@@ -1,9 +1,17 @@
 import { cleanup, render, screen } from "@testing-library/vue";
+import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import CartSummary from "../cart/CartSummary.vue";
 import { useCart } from "@/composables";
 import { createDummyCartItem, formatMoney } from "@/utils";
 import { STANDARD_TAX_RATE } from "@/consts";
+
+vi.mock("@/composables/useToast", () => ({
+  default: () => ({
+    showSuccessToast: vi.fn(),
+    showErrorToast: vi.fn(),
+  }),
+}));
 
 vi.stubGlobal(
   "fetch",
@@ -75,5 +83,44 @@ describe("CartSummary", () => {
     expect(totalRow).toHaveTextContent(
       formatMoney(expectedTotal).replace(/\u00a0/g, " "),
     );
+  });
+
+  it("emits click:checkout with navigation state when checkout is clicked", async () => {
+    const user = userEvent.setup();
+    const { summary, addItemToCart } = useCart();
+    const { emitted } = render(CartSummary);
+
+    await addItemToCart(createDummyCartItem(1));
+
+    const checkoutButton = screen.getByTestId("cart-checkout-button");
+    expect(checkoutButton).toBeEnabled();
+
+    await user.click(checkoutButton);
+
+    expect(emitted()["click:checkout"]).toHaveLength(1);
+    expect(emitted()["click:checkout"]!.at(0)).toEqual([
+      {
+        itemCount: summary.value.count,
+        orderSummary: {
+          itemCount: summary.value.count,
+          subtotal: summary.value.subTotal,
+          shipping: summary.value.shippingCost,
+          tax: summary.value.tax,
+          total: summary.value.total,
+        },
+      },
+    ]);
+  });
+
+  it("disables checkout and does not emit when the cart is empty", async () => {
+    const user = userEvent.setup();
+    const { emitted } = render(CartSummary);
+
+    const checkoutButton = screen.getByTestId("cart-checkout-button");
+    expect(checkoutButton).toBeDisabled();
+
+    await user.click(checkoutButton);
+
+    expect(emitted()["click:checkout"]).toBeUndefined();
   });
 });

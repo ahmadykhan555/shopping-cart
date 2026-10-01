@@ -23,28 +23,37 @@ Demo shopping cart built for the Neuffer frontend take-home task: fetch products
 
 ### Core (task requirements)
 
-| Requirement                | Implementation                                                                                                     |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Load initial cart from API | `GET` [DummyJSON products](https://dummyjson.com/docs/products) (`limit` from `MAX_CART_ITEMS`) on cart page mount |
-| Display line items         | Image, title, description, unit price, quantity, line total                                                        |
-| Adjust quantity            | `QuantitySelector` with min/max clamping and direct numeric input                                                  |
-| Remove item                | Remove control on each line                                                                                        |
-| Clear cart                 | Clears items and shipping; success toast                                                                           |
-| Add item                   | `POST` to DummyJSON `products/add`, then append to local cart                                                      |
-| Subtotal & 20% tax         | Computed in `useCart` `summary`                                                                                    |
-| Proceed to checkout        | Navigates to success page with order summary; cart cleared after successful navigation                             |
-| Responsive layout          | Collapsible summary/shipping on smaller viewports; grid layout on desktop                                          |
+| Requirement                | Implementation                                                                                                                                 |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Load initial cart from API | `GET` [DummyJSON products](https://dummyjson.com/docs/products) (`limit` from `MAX_CART_ITEMS`) on cart page mount                             |
+| Display line items         | Image, title, description, unit price, quantity, line total                                                                                    |
+| Adjust quantity            | `QuantitySelector` with min/max clamping and direct numeric input                                                                              |
+| Remove item                | Remove control on each line                                                                                                                    |
+| Clear cart                 | Clears items and shipping; success toast                                                                                                       |
+| Add item                   | `POST` to DummyJSON `products/add` with a generated payload (`createDummyCartItem`); response merged into local cart with a client-assigned id |
+| Subtotal & 20% tax         | Computed in `useCart` `summary`                                                                                                                |
+| Proceed to checkout        | Navigates to success page with order summary; cart cleared after successful navigation                                                         |
+| Responsive layout          | Collapsible summary/shipping on smaller viewports; grid layout on desktop                                                                      |
 
 ### Bonus / extras
 
 - **Shipping UI** — Form with validation (`useFormValidation`); mocked cost via random value in configured range
 - **Totals** — Subtotal + shipping + tax in order summary
 - **Toasts** — Success/error feedback (Notivue) for cart actions and API errors
-- **Checkout success** — Dedicated page with confetti and persisted summary via router `history.state`
+- **Checkout success** — Dedicated page with confetti; order summary passed via router `state` for the success route
 - **Tests** — Unit and component tests for cart logic, API helper, and key UI (see [Testing](#testing))
 - **Loading & empty states** — Skeleton loader and empty-cart CTA
 
-Pinia was not used; cart state lives in a shared composable (see [Decisions & tradeoffs](#decisions--tradeoffs)).
+Cart state lives in a shared composable (see [Technical decisions](#technical-decisions)).
+
+## Quick manual check
+
+1. Open `/cart` and wait for products to load.
+2. Change quantity on a line; confirm line total and order summary update.
+3. Remove an item and use **Clear cart** (empty state + add CTA).
+4. **Add item** — POST runs; a new line appears with the demo payload price.
+5. **Calculate Shipping** — fill the form, submit; shipping row updates totals.
+6. **Proceed to checkout** — success page shows summary; return via **Back to cart**.
 
 ## How to run
 
@@ -53,11 +62,12 @@ Requires **Node.js ≥ 20** (see `.nvmrc`).
 ```bash
 nvm use
 pnpm install
-pnpm run dev      # http://localhost:5173
-pnpm run test     # watch mode
+pnpm run dev          # http://localhost:5173
+pnpm run test         # Vitest watch mode (interactive)
+pnpm run test:run     # single run, exits (CI-friendly)
 pnpm run test:coverage
-pnpm run build
-pnpm run preview  # serve production build locally
+pnpm run build        # vue-tsc + production bundle
+pnpm run preview      # serve production build locally
 ```
 
 ## Tech stack
@@ -66,6 +76,8 @@ pnpm run preview  # serve production build locally
 - **Routing:** Vue Router
 - **Styling:** Tailwind CSS
 - **Bundler:** Vite
+- **UI feedback:** [Notivue](https://notivue.netlify.app/) (toasts)
+- **Checkout success:** [canvas-confetti](https://www.npmjs.com/package/canvas-confetti)
 - **Testing:** Vitest, Testing Library, jsdom
 - **Package manager:** pnpm
 
@@ -84,14 +96,29 @@ src/
 │   └── __tests__/    # Composable unit tests
 ├── consts/           # App constants (API URLs, cart limits, routes)
 ├── pages/            # Route-level views (cart, checkout success)
-│   └── __tests__/    # Page tests (when added)
 ├── test/             # Vitest setup and render helpers
 ├── types/            # TypeScript domain types
 ├── utils/            # Pure helpers (money formatting, cart math)
-├── App.vue           # Root layout (header + router outlet)
+├── App.vue           # Root layout (header + router outlet + toast host)
 ├── main.ts           # App bootstrap
 └── router.ts         # Vue Router config
 ```
+
+### Composables (`src/composables/`)
+
+- **`useCart`** — Cart items, loading flags, computed `summary`, fetch/add/remove/qty/shipping/checkout helpers
+- **`useApi`** — Shared `fetch` wrapper, error messages, error toasts
+- **`useFormValidation`** — Field rules and touch/submit validation (shipping calculator)
+- **`useToast`** — Thin wrapper around Notivue success/error toasts
+
+### Data flow
+
+Cart data is centralized in **`useCart`** (shared composable state). Components use two patterns, depending on depth:
+
+- **Direct composable access** — `AppHeader`, `CartSummary`, and `CartShippingCostCalculator` call `useCart()` for totals, flags, or mutations without prop drilling through `CartPage`.
+- **Props down, events up** — `CartPage` passes each line as an `item` prop to `CartItem`, passes disabled flags to `CartActions`, wires `@updateItemQuantity`, `@click:removeItem`, `@addItem`, `@clearCart`, and `@click:checkout` (router navigation + `emptyCart`) to `useCart` / the router. `QuantitySelector` stays presentational (quantity in, `update:quantity` out).
+
+`CartPage` owns route-level orchestration (fetch on mount, layout, loading/empty vs list). Leaf UI stays testable; sidebar and header read the same reactive cart as the list.
 
 ### Components
 
@@ -108,7 +135,7 @@ src/
 - **`CartItem`** — Single line: image, details, price, quantity, line total, remove
 - **`QuantitySelector`** — +/- and numeric input with clamping
 - **`CartActions`** — Add item and clear cart (sticky footer on list view)
-- **`CartSummary`** — Subtotal, shipping, tax, total; checkout; collapsible on small screens
+- **`CartSummary`** — Subtotal, shipping, tax, total; emits `click:checkout` with order state; collapsible on small screens
 - **`CartSummaryItem`** — Summary row (also used on checkout success)
 - **`CartShippingCostCalculator`** — Shipping form, validation, save cost to cart state
 
@@ -119,45 +146,59 @@ src/
 
 ### Domain rules
 
+- **Initial catalog:** Up to **`MAX_CART_ITEMS` (15)** products from the API; prices come from DummyJSON
 - **Tax:** 20% on subtotal only (shipping excluded from tax base)
 - **Item count:** Header badge, cart page subtitle, and checkout use total **units** (`summary.count` = sum of line quantities), not number of lines
 - **Money:** Formatted as EUR via `Intl` (`de-DE`)
 - **Quantity:** Clamped between `MIN_QUANTITY` and `MAX_QUANTITY` (see `src/consts/cart.ts`)
+- **Add-item demo:** **Add item** uses `createDummyCartItem` with fixed **`DUMMY_CART_ITEM_UNIT_PRICE` (10)** for predictable tests; catalog lines keep API prices
 
-## Decisions & tradeoffs
+### Accessibility (selected)
+
+- Loading skeleton exposes `role="status"` / `aria-busy`
+- Remove buttons and primary actions use descriptive `aria-label`s
+- Shipping inputs use `aria-invalid` and `aria-describedby` for errors
+
+## Technical decisions
+
+Choices below match the take-home scope: one cart flow, a small set of routes, and no order backend.
 
 ### Rendering (CSR)
 
-Single-page client-side rendering only. **Tradeoff:** No SSR/SEO; acceptable for a focused cart demo with no server HTML requirements.
+The app is a client-rendered SPA (Vite + Vue Router). The task centers on an interactive cart page and checkout confirmation, not content indexing or server-driven HTML.
 
-### Products API (DummyJSON vs FakeStore)
+**When SSR or SSG would be worth it:** Marketing pages that must rank in search, first-paint performance budgets on slow devices, or embedding cart in a larger SSR host (e.g. Nuxt).
 
-FakeStoreAPI was unreliable (522 errors); after alignment with the hiring team, [DummyJSON](https://dummyjson.com) is used instead.
+### Products API (DummyJSON)
+
+The brief specifies FakeStore-style `GET`/`POST` product endpoints. FakeStoreAPI was unavailable (522 errors); after alignment with the hiring team, [DummyJSON](https://dummyjson.com) fulfills the same integration pattern.
 
 | Task spec          | This app                |
 | ------------------ | ----------------------- |
 | `GET` products     | `GET /products?limit=…` |
 | `POST` add product | `POST /products/add`    |
 
-**Tradeoffs:** DummyJSON is a product catalog, not a real cart—state is client-side only. POST responses reuse a fixed product id, so new lines get **client-generated ids** (`getNextItemId`). Refetching products replaces the cart with catalog data, not user edits.
+Cart contents are held in app state after the initial fetch, which matches how the task describes populating and mutating the cart locally. DummyJSON returns a hardcoded id on add, so newly added lines use **client-assigned ids** (`getNextItemId`) for unique ids, to keep the list consistent in the UI.
 
 ### State management (`useCart`)
 
-Module-level `ref`s inside `useCart` share cart state app-wide (singleton composable).
+Cart state lives in module-level `ref`s exposed through a single `useCart` composable. A few components and pages read the same cart, totals, and flags without prop drilling.
 
-**Tradeoff:** Less boilerplate than Pinia for this scope; tests must call `resetCartState()`. Not ideal for many domains or SSR without careful isolation.
+**Why this fits here:** One domain (cart), a handful of mutations, and straightforward computed summary—no cross-feature stores or plugins.
+
+**When [Pinia](https://pinia.vuejs.org/) would be a better fit:** Multiple independent slices (auth, catalog, cart, checkout) with shared devtools; persisted cart or user sessions; middleware/plugins; larger teams standardizing on a store pattern; or splitting logic across many routes and lazy-loaded chunks where explicit store modules aid navigation.
 
 ### API layer (`useApi`)
 
-Central `apiCall` wraps `fetch`, maps errors to user-facing messages, shows error toasts, and supports `onSuccess` / `onError` callbacks.
+HTTP calls go through one `apiCall` helper: shared defaults, mapped error messages, and user-facing toasts. Cart fetch/add stay focused on data mapping in `useCart`.
 
-**Tradeoff:** Consistent UX and one place for HTTP error handling; callers that need silent retries or custom UI must bypass or extend the helper.
+**Why this fits here:** Only two endpoints and one consistent error UX for the demo.
 
-### Checkout data (`history.state`)
+### Checkout flow
 
-Order summary is passed via Vue Router `state` to the success page.
+The task asks for checkout as a simple confirmation, not payment processing. The app navigates to a success route with the order summary in router `state`, then clears the cart after navigation succeeds.
 
-**Tradeoff:** Simple with no backend; refresh or direct URL to success loses data (page redirects to cart). Cart is cleared only after `router.push` resolves (navigation failure keeps the cart).
+**Why this fits here:** No order API; reviewers can complete the flow in one click from the live demo.
 
 ## Testing
 
@@ -165,14 +206,17 @@ Order summary is passed via Vue Router `state` to the success page.
 | ----------- | ---------------------------------------------------------------------------------------------------------------- |
 | Cart logic  | `src/composables/__tests__/useCart.test.ts` — totals, quantity clamp, shipping, fetch/add failure, id assignment |
 | HTTP helper | `src/composables/__tests__/useApi.test.ts` — success path, errors, toasts                                        |
-| UI          | `src/components/__tests__/` — `CartSummary`, `AppHeader`, `QuantitySelector`, `AppButton`                        |
+| UI          | `src/components/__tests__/` — `CartSummary`, `CartActions`, `AppHeader`, `QuantitySelector`, `AppButton`           |
 
-Run `pnpm run test` or `pnpm run test:coverage`.
+Use **`pnpm run test:run`** for a single pass, **`pnpm run test`** for watch mode, or **`pnpm run test:coverage`** for coverage.
 
 ## Known limitations
 
-- No cart persistence (refresh loses in-memory state unless re-fetched from products API)
+- No cart persistence (refresh on `/cart` re-fetches the product catalog into cart state)
+- Failed initial load shows an error toast and leaves the cart empty until a successful fetch (e.g. reload)
+- **Add item** POSTs a generated demo payload; it is not selecting a new product from the catalog
 - Shipping cost is mocked (form fields validate but do not affect the random cost algorithm)
-- No real payment or order backend
+- Checkout summary is tied to router `state` for that navigation (reload on `/checkout-success` redirects to cart)
+- No payment or order backend
 - Unknown routes redirect to the cart (no dedicated 404 page)
-- Checkout confirmation does not survive a full page reload on the success URL
+- Tests focus on cart logic, API helper, and primary UI paths—not exhaustive E2E coverage

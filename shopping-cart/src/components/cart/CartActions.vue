@@ -5,14 +5,16 @@
     <AppButton
       variant="secondary"
       aria-label="Add item to cart"
+      data-testid="cart-add-item-button"
       @click="$emit('addItem')"
-      :disabled="isAddingItemToCart"
+      :disabled="disableAddButton"
     >
       Add item
     </AppButton>
     <AppButton
       aria-label="Clear cart"
-      :disabled="cartItems.length === 0"
+      data-testid="cart-clear-button"
+      :disabled="disableClearButton"
       variant="danger"
       @click="$emit('clearCart')"
     >
@@ -22,10 +24,17 @@
 </template>
 
 <script setup lang="ts">
-import { useCart } from "@/composables";
 import AppButton from "../base/AppButton.vue";
 
+withDefaults(
+  defineProps<{
+    disableAddButton?: boolean;
+    disableClearButton?: boolean;
+  }>(),
+  {
+    disableAddButton: false,
+    disableClearButton: false,
+  },
+);
 defineEmits(["addItem", "clearCart"]);
-
-const { cartItems, isAddingItemToCart } = useCart();
 </script>

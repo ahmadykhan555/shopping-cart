@@ -49,6 +49,7 @@
         class="mt-2 w-full py-3"
         variant="secondary"
         aria-label="Proceed to checkout"
+        data-testid="cart-checkout-button"
         :disabled="isCheckoutDisabled"
         @click="handleCheckout"
       >
@@ -61,12 +62,11 @@
 <script setup lang="ts">
 import { formatMoney } from "@/utils";
 import { computed, ref } from "vue";
-import { useRouter } from "vue-router";
 import { useCart } from "@/composables";
 import AppButton from "../base/AppButton.vue";
 import CartSummaryItem from "./CartSummaryItem.vue";
 import type { CheckoutSuccessHistoryState } from "@/types";
-import { APP_ROUTES, STANDARD_TAX_RATE } from "@/consts";
+import { STANDARD_TAX_RATE } from "@/consts";
 
 const props = withDefaults(
   defineProps<{
@@ -85,8 +85,11 @@ const toggleCollapsed = () => {
   isCollapsed.value = !isCollapsed.value;
 };
 
-const router = useRouter();
-const { isFetching, summary, cartItems, emptyCart } = useCart();
+const emit = defineEmits<{
+  "click:checkout": [navigationState: CheckoutSuccessHistoryState];
+}>();
+
+const { isFetching, summary } = useCart();
 
 const summaryItems = computed(() => [
   {
@@ -107,13 +110,13 @@ const summaryItems = computed(() => [
   },
 ]);
 
-const handleCheckout = async () => {
+const handleCheckout = () => {
   const itemCount = summary.value.count;
   if (itemCount < 1) {
     return;
   }
 
-  const navigationState: CheckoutSuccessHistoryState = {
+  emit("click:checkout", {
     itemCount,
     orderSummary: {
       itemCount,
@@ -122,17 +125,7 @@ const handleCheckout = async () => {
       tax: summary.value.tax,
       total: summary.value.total,
     },
-  };
-
-  try {
-    await router.push({
-      path: APP_ROUTES.CHECKOUT_SUCCESS,
-      state: navigationState,
-    });
-    emptyCart();
-  } catch (error) {
-    console.error(error);
-  }
+  });
 };
 
 const isCheckoutDisabled = computed(
