@@ -62,18 +62,20 @@
 <script setup lang="ts">
 import { formatMoney } from "@/utils";
 import { computed, ref } from "vue";
-import { useCart } from "@/composables";
 import AppButton from "../base/AppButton.vue";
 import CartSummaryItem from "./CartSummaryItem.vue";
-import type { CheckoutSuccessHistoryState } from "@/types";
+import type { CartSummary, CheckoutSuccessHistoryState } from "@/types";
 import { STANDARD_TAX_RATE } from "@/consts";
 
 const props = withDefaults(
   defineProps<{
+    summary: CartSummary;
+    isFetching?: boolean;
     collapsible?: boolean;
     initialCollapsed?: boolean;
   }>(),
   {
+    isFetching: false,
     collapsible: false,
     initialCollapsed: true,
   },
@@ -89,29 +91,27 @@ const emit = defineEmits<{
   "click:checkout": [navigationState: CheckoutSuccessHistoryState];
 }>();
 
-const { isFetching, summary } = useCart();
-
 const summaryItems = computed(() => [
   {
     label: "Subtotal",
-    value: formatMoney(summary.value.subTotal),
+    value: formatMoney(props.summary.subTotal),
   },
   {
     label: "Shipping",
-    value: formatMoney(summary.value.shippingCost),
+    value: formatMoney(props.summary.shippingCost),
   },
   {
     label: `Tax (${STANDARD_TAX_RATE * 100}%)`,
-    value: formatMoney(summary.value.tax),
+    value: formatMoney(props.summary.tax),
   },
   {
     label: "Total",
-    value: formatMoney(summary.value.total),
+    value: formatMoney(props.summary.total),
   },
 ]);
 
 const handleCheckout = () => {
-  const itemCount = summary.value.count;
+  const itemCount = props.summary.count;
   if (itemCount < 1) {
     return;
   }
@@ -120,15 +120,15 @@ const handleCheckout = () => {
     itemCount,
     orderSummary: {
       itemCount,
-      subtotal: summary.value.subTotal,
-      shipping: summary.value.shippingCost,
-      tax: summary.value.tax,
-      total: summary.value.total,
+      subtotal: props.summary.subTotal,
+      shipping: props.summary.shippingCost,
+      tax: props.summary.tax,
+      total: props.summary.total,
     },
   });
 };
 
 const isCheckoutDisabled = computed(
-  () => isFetching.value || !summary.value.subTotal,
+  () => props.isFetching || !props.summary.subTotal,
 );
 </script>

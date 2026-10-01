@@ -115,10 +115,10 @@ src/
 
 Cart data is centralized in **`useCart`** (shared composable state). Components use two patterns, depending on depth:
 
-- **Direct composable access** — `AppHeader` and `CartSummary` call `useCart()` for totals and flags without prop drilling through `CartPage`.
-- **Props down, events up** — `CartPage` passes each line as an `item` prop to `CartItem`, passes disabled flags to `CartActions`, passes `shippingCost` to `CartShippingCostCalculator`, and wires `@updateItemQuantity`, `@click:removeItem`, `@addItem`, `@clearCart`, `@update:shippingCost` → `saveShippingCost`, and `@click:checkout` (router navigation + `emptyCart`) to `useCart` / the router. `QuantitySelector` stays presentational (quantity in, `update:quantity` out).
+- **Direct composable access** — `AppHeader` calls `useCart()` for the cart badge without prop drilling through `App.vue`.
+- **Props down, events up** — `CartPage` passes `summary` and `isFetching` to `CartSummary`, `shippingCost` to `CartShippingCostCalculator`, each line as an `item` to `CartItem`, and disabled flags to `CartActions`; it wires `@updateItemQuantity`, `@click:removeItem`, `@addItem`, `@clearCart`, `@update:shippingCost` → `saveShippingCost`, and `@click:checkout` (router navigation + `emptyCart`) to `useCart` / the router. `QuantitySelector` stays presentational (quantity in, `update:quantity` out).
 
-`CartPage` owns route-level orchestration (fetch on mount, layout, loading/empty vs list). Leaf UI stays testable; sidebar and header read the same reactive cart as the list.
+`CartPage` owns route-level orchestration (fetch on mount, layout, loading/empty vs list). Cart sidebar and line-item UI are testable without touching global cart state except through props and emits.
 
 ### Components
 
@@ -135,7 +135,7 @@ Cart data is centralized in **`useCart`** (shared composable state). Components 
 - **`CartItem`** — Single line: image, details, price, quantity, line total, remove
 - **`QuantitySelector`** — +/- and numeric input with clamping
 - **`CartActions`** — Add item and clear cart (sticky footer on list view)
-- **`CartSummary`** — Subtotal, shipping, tax, total; emits `click:checkout` with order state; collapsible on small screens
+- **`CartSummary`** — Subtotal, shipping, tax, total from `summary` prop; emits `click:checkout` with order state; collapsible on small screens
 - **`CartSummaryItem`** — Summary row (also used on checkout success)
 - **`CartShippingCostCalculator`** — Shipping form, validation; emits `update:shippingCost` with calculated cost
 

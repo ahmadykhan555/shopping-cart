@@ -24,6 +24,8 @@
         <CartSummary
           collapsible
           :initial-collapsed="false"
+          :summary="summary"
+          :is-fetching="isFetching"
           @click:checkout="handleCheckout"
         />
         <CartShippingCostCalculator
@@ -97,9 +99,8 @@ const {
 
 const router = useRouter();
 
-const handleCheckout = async (
-  navigationState: CheckoutSuccessHistoryState,
-) => {
+const handleCheckout = async (navigationState: CheckoutSuccessHistoryState) => {
+  if (!navigationState) return;
   try {
     await router.push({
       path: APP_ROUTES.CHECKOUT_SUCCESS,

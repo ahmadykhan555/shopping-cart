@@ -5,13 +5,7 @@ import CartSummary from "../cart/CartSummary.vue";
 import { useCart } from "@/composables";
 import { createDummyCartItem, formatMoney } from "@/utils";
 import { STANDARD_TAX_RATE } from "@/consts";
-
-vi.mock("@/composables/useToast", () => ({
-  default: () => ({
-    showSuccessToast: vi.fn(),
-    showErrorToast: vi.fn(),
-  }),
-}));
+import type { CartSummary as CartSummaryModel } from "@/types";
 
 vi.stubGlobal(
   "fetch",
@@ -21,18 +15,23 @@ vi.stubGlobal(
   }),
 );
 
+function renderCartSummary(summary: CartSummaryModel, isFetching = false) {
+  return render(CartSummary, {
+    props: { summary, isFetching },
+  });
+}
+
 beforeEach(() => {
   vi.clearAllMocks();
   cleanup();
   useCart().resetCartState();
 });
-describe("CartSummary", () => {
-  // general sanity check
 
+describe("CartSummary", () => {
   it("renders component correctly", () => {
     const { summary } = useCart();
 
-    render(CartSummary);
+    renderCartSummary(summary.value);
 
     const subTotalRow = screen.getByText(/Subtotal/i).closest("div");
     expect(subTotalRow).toHaveTextContent(
@@ -55,10 +54,10 @@ describe("CartSummary", () => {
     );
   });
 
-  it("Amounts are updated correctly when cart items are added", async () => {
+  it("Amounts are updated correctly when summary prop changes", async () => {
     const { summary, addItemToCart } = useCart();
 
-    render(CartSummary);
+    const { rerender } = renderCartSummary(summary.value);
 
     const subTotalRow = screen.getByText(/Subtotal/i).closest("div");
     const taxRow = screen.getByText(/tax/i).closest("div");
@@ -68,6 +67,8 @@ describe("CartSummary", () => {
 
     const addItemPayload = createDummyCartItem(1);
     await addItemToCart(addItemPayload);
+
+    await rerender({ summary: summary.value, isFetching: false });
 
     const addedItemPrice = addItemPayload.price * addItemPayload.quantity;
     const expectedSubTotal = oldSubTotal + addedItemPrice;
@@ -88,9 +89,10 @@ describe("CartSummary", () => {
   it("emits click:checkout with navigation state when checkout is clicked", async () => {
     const user = userEvent.setup();
     const { summary, addItemToCart } = useCart();
-    const { emitted } = render(CartSummary);
 
     await addItemToCart(createDummyCartItem(1));
+
+    const { emitted } = renderCartSummary(summary.value);
 
     const checkoutButton = screen.getByTestId("cart-checkout-button");
     expect(checkoutButton).toBeEnabled();
@@ -114,7 +116,8 @@ describe("CartSummary", () => {
 
   it("disables checkout and does not emit when the cart is empty", async () => {
     const user = userEvent.setup();
-    const { emitted } = render(CartSummary);
+    const { summary } = useCart();
+    const { emitted } = renderCartSummary(summary.value);
 
     const checkoutButton = screen.getByTestId("cart-checkout-button");
     expect(checkoutButton).toBeDisabled();
@@ -122,5 +125,13 @@ describe("CartSummary", () => {
     await user.click(checkoutButton);
 
     expect(emitted()["click:checkout"]).toBeUndefined();
+  });
+
+  it("disables checkout while isFetching is true", () => {
+    const { summary } = useCart();
+
+    renderCartSummary(summary.value, true);
+
+    expect(screen.getByTestId("cart-checkout-button")).toBeDisabled();
   });
 });
