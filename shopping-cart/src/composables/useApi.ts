@@ -1,5 +1,8 @@
-import { DEFAULT_API_OPTIONS } from "@/consts";
-import { ADD_ITEM_TO_CART_URL, FETCH_CART_ITEMS_URL } from "@/consts";
+import {
+  ADD_ITEM_TO_CART_URL,
+  DEFAULT_API_OPTIONS,
+  FETCH_CART_ITEMS_URL,
+} from "@/consts";
 import useToast from "./useToast";
 
 const DEFAULT_API_ERROR_MESSAGE = "Something went wrong. Please try again.";
@@ -18,6 +21,7 @@ type ApiCallParams<T> = {
   url: string;
   options?: RequestInit;
   onSuccess?: (data: T) => void;
+  onError?: (message: string) => void;
 };
 
 export default function useApi() {
@@ -27,7 +31,8 @@ export default function useApi() {
     url,
     options = DEFAULT_API_OPTIONS,
     onSuccess,
-  }: ApiCallParams<T>): Promise<void> => {
+    onError,
+  }: ApiCallParams<T>): Promise<boolean> => {
     try {
       const response = await fetch(url, options);
       if (!response.ok) {
@@ -35,11 +40,13 @@ export default function useApi() {
       }
       const data = (await response.json()) as T;
       onSuccess?.(data);
+      return true;
     } catch (err) {
       const errorMessage = getApiErrorMessage(url, options);
-      console.error(errorMessage);
+      console.error(errorMessage, err);
       showErrorToast(errorMessage);
-      throw errorMessage;
+      onError?.(errorMessage);
+      return false;
     }
   };
 

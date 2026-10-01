@@ -22,7 +22,6 @@
       @click="$emit('addItem')"
     >
       Add item
-      <ArrowRightIcon class="size-4" />
     </AppButton>
   </div>
 </template>
@@ -30,7 +29,6 @@
 <script setup lang="ts">
 import AppButton from "../base/AppButton.vue";
 import CartIcon from "@/assets/icons/CartIcon.vue";
-import ArrowRightIcon from "@/assets/icons/ArrowRightIcon.vue";
 
 defineEmits(["addItem"]);
 </script>

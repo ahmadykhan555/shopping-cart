@@ -22,7 +22,6 @@ const router = createRouter({
       component: () => import("./pages/CheckoutSuccessPage.vue"),
       meta: { title: "Order success" },
     },
-    // todo add catch all for 404
     {
       name: "not-found",
       path: "/:pathMatch(.*)*",

@@ -49,6 +49,7 @@
         class="mt-2 w-full py-3"
         variant="secondary"
         aria-label="Proceed to checkout"
+        data-testid="cart-checkout-button"
         :disabled="isCheckoutDisabled"
         @click="handleCheckout"
       >
@@ -61,19 +62,20 @@
 <script setup lang="ts">
 import { formatMoney } from "@/utils";
 import { computed, ref } from "vue";
-import { useRouter } from "vue-router";
-import { useCart } from "@/composables";
 import AppButton from "../base/AppButton.vue";
 import CartSummaryItem from "./CartSummaryItem.vue";
-import type { CheckoutSuccessHistoryState } from "@/types";
-import { APP_ROUTES, STANDARD_TAX_RATE } from "@/consts";
+import type { CartSummary, CheckoutSuccessHistoryState } from "@/types";
+import { STANDARD_TAX_RATE } from "@/consts";
 
 const props = withDefaults(
   defineProps<{
+    summary: CartSummary;
+    isFetching?: boolean;
     collapsible?: boolean;
     initialCollapsed?: boolean;
   }>(),
   {
+    isFetching: false,
     collapsible: false,
     initialCollapsed: true,
   },
@@ -85,54 +87,48 @@ const toggleCollapsed = () => {
   isCollapsed.value = !isCollapsed.value;
 };
 
-const router = useRouter();
-const { isFetching, summary, cartItems, emptyCart } = useCart();
+const emit = defineEmits<{
+  "click:checkout": [navigationState: CheckoutSuccessHistoryState];
+}>();
 
 const summaryItems = computed(() => [
   {
     label: "Subtotal",
-    value: formatMoney(summary.value.subTotal),
+    value: formatMoney(props.summary.subTotal),
   },
   {
     label: "Shipping",
-    value: formatMoney(summary.value.shippingCost),
+    value: formatMoney(props.summary.shippingCost),
   },
   {
     label: `Tax (${STANDARD_TAX_RATE * 100}%)`,
-    value: formatMoney(summary.value.tax),
+    value: formatMoney(props.summary.tax),
   },
   {
     label: "Total",
-    value: formatMoney(summary.value.total),
+    value: formatMoney(props.summary.total),
   },
 ]);
 
-const handleCheckout = async () => {
-  const itemCount = cartItems.value.length;
+const handleCheckout = () => {
+  const itemCount = props.summary.count;
   if (itemCount < 1) {
     return;
   }
 
-  const navigationState: CheckoutSuccessHistoryState = {
+  emit("click:checkout", {
     itemCount,
     orderSummary: {
       itemCount,
-      subtotal: summary.value.subTotal,
-      shipping: summary.value.shippingCost,
-      tax: summary.value.tax,
-      total: summary.value.total,
+      subtotal: props.summary.subTotal,
+      shipping: props.summary.shippingCost,
+      tax: props.summary.tax,
+      total: props.summary.total,
     },
-  };
-
-  await router.push({
-    path: APP_ROUTES.CHECKOUT_SUCCESS,
-    state: navigationState,
   });
-
-  emptyCart();
 };
 
 const isCheckoutDisabled = computed(
-  () => isFetching.value || !summary.value.subTotal,
+  () => props.isFetching || !props.summary.subTotal,
 );
 </script>

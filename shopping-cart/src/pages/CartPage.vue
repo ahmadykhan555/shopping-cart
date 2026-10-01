@@ -6,9 +6,9 @@
       >
         Your cart
       </h1>
-      <p v-if="cartItems.length" class="mt-2 text-sm text-gray-600">
-        {{ cartItems.length }}
-        {{ cartItems.length === 1 ? "item" : "items" }}
+      <p v-if="summary.count" class="mt-2 text-sm text-gray-600">
+        {{ summary.count }}
+        {{ summary.count === 1 ? "item" : "items" }}
       </p>
     </header>
 
@@ -21,11 +21,19 @@
       <aside
         class="order-first w-full shrink-0 lg:order-2 lg:sticky lg:top-24 lg:w-80 xl:w-96"
       >
-        <CartSummary collapsible :initial-collapsed="false" />
+        <CartSummary
+          collapsible
+          :initial-collapsed="false"
+          :summary="summary"
+          :is-fetching="isFetching"
+          @click:checkout="handleCheckout"
+        />
         <CartShippingCostCalculator
           class="mt-4 lg:mt-6"
           collapsible
           initial-collapsed
+          :shipping-cost="summary.shippingCost"
+          @update:shipping-cost="saveShippingCost"
         />
       </aside>
 
@@ -48,14 +56,13 @@
           </div>
           <CartActions
             class="absolute inset-x-0 bottom-0 z-10 bg-white/75 backdrop-blur-md"
+            :disable-add-button="isAddingItemToCart"
+            :disable-clear-button="cartItems.length === 0"
             @addItem="addDemoItemToCart"
             @clearCart="clearCart"
           />
         </div>
-        <CartEmptyState
-          v-else
-          @addItem="addDemoItemToCart"
-        />
+        <CartEmptyState v-else @addItem="addDemoItemToCart" />
       </div>
     </div>
   </div>
@@ -63,7 +70,10 @@
 
 <script setup lang="ts">
 import { onMounted } from "vue";
+import { useRouter } from "vue-router";
 import { useCart } from "@/composables";
+import { APP_ROUTES } from "@/consts";
+import type { CheckoutSuccessHistoryState } from "@/types";
 import CartItem from "@/components/cart/CartItem.vue";
 import CartSummary from "@/components/cart/CartSummary.vue";
 import CartItemsColumnHeaders from "@/components/cart/CartItemsColumnHeaders.vue";
@@ -74,6 +84,7 @@ import CartEmptyState from "@/components/cart/CartEmptyState.vue";
 
 const {
   cartItems,
+  summary,
   isFetching,
   hasInitializedCart,
   fetchCartItems,
@@ -81,7 +92,25 @@ const {
   clearCart,
   updateItemQuantity,
   removeItemFromCart,
+  isAddingItemToCart,
+  saveShippingCost,
+  emptyCart,
 } = useCart();
+
+const router = useRouter();
+
+const handleCheckout = async (navigationState: CheckoutSuccessHistoryState) => {
+  if (!navigationState) return;
+  try {
+    await router.push({
+      path: APP_ROUTES.CHECKOUT_SUCCESS,
+      state: navigationState,
+    });
+    emptyCart();
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 onMounted(() => {
   if (isFetching.value || hasInitializedCart.value) return;

@@ -7,8 +7,6 @@ export const DEFAULT_API_OPTIONS: RequestInit = {
   },
 };
 
-export const BASE_API_URL = "https://dummyjson.com";
+const BASE_API_URL = "https://dummyjson.com";
 export const FETCH_CART_ITEMS_URL = `${BASE_API_URL}/products?limit=${MAX_CART_ITEMS}`;
 export const ADD_ITEM_TO_CART_URL = `${BASE_API_URL}/products/add`;
-export const FETCH_ITEM_BY_ID_URL = (id: number) =>
-  `${BASE_API_URL}/products/${id}`;
