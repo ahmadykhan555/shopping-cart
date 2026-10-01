@@ -57,8 +57,6 @@ Cart state lives in a shared composable (see [Technical decisions](#technical-de
 
 ## How to run
 
-**Repository layout:** The Git root is the **parent** folder (`…/shopping-cart/`); this Vue app and `package.json` live in the nested `shopping-cart/` directory. Run all commands below from that nested folder.
-
 Requires **Node.js ≥ 20** (see `.nvmrc`).
 
 ```bash
@@ -207,22 +205,20 @@ The task asks for checkout as a simple confirmation, not payment processing. The
 
 ## Testing
 
-| Area        | Files                                                                                                            |
-| ----------- | ---------------------------------------------------------------------------------------------------------------- |
-| Cart logic  | `src/composables/__tests__/useCart.test.ts` — totals, quantity clamp, shipping, fetch/add failure, id assignment |
-| HTTP helper | `src/composables/__tests__/useApi.test.ts` — success path, errors, toasts                                        |
-| Form validation | `src/composables/__tests__/useFormValidation.test.ts` — touch/submit gating, required and custom rules       |
-| UI          | `src/components/__tests__/` — `CartSummary`, `CartActions`, `AppHeader`, `QuantitySelector`, `AppButton`           |
+| Area            | Files                                                                                                            |
+| --------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Cart logic      | `src/composables/__tests__/useCart.test.ts` — totals, quantity clamp, shipping, fetch/add failure, id assignment |
+| HTTP helper     | `src/composables/__tests__/useApi.test.ts` — success path, errors, toasts                                        |
+| Form validation | `src/composables/__tests__/useFormValidation.test.ts` — touch/submit gating, required and custom rules           |
+| UI              | `src/components/__tests__/` — `CartSummary`, `CartActions`, `AppHeader`, `QuantitySelector`, `AppButton`         |
 
 Use **`pnpm run test:run`** for a single pass, **`pnpm run test`** for watch mode, or **`pnpm run test:coverage`** for coverage.
 
 ## Known limitations
 
 - No cart persistence (refresh on `/cart` re-fetches the product catalog into cart state)
-- Failed initial load shows an error toast and leaves the cart empty until a successful fetch (e.g. reload)
 - **Add item** POSTs a generated demo payload; it is not selecting a new product from the catalog
 - Shipping cost is mocked (form fields validate but do not affect the random cost algorithm)
 - Checkout summary is tied to router `state` for that navigation (reload on `/checkout-success` redirects to cart)
-- No payment or order backend
 - Unknown routes redirect to the cart (no dedicated 404 page)
 - Tests focus on cart logic, API helper, and primary UI paths—not exhaustive E2E coverage
