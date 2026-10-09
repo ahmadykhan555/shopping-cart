@@ -13,7 +13,8 @@ export function clampCartQuantity(
   if (!Number.isFinite(value)) {
     return min;
   }
-  return Math.min(max, Math.max(min, Math.floor(value)));
+  const integerQuantity = Math.floor(value);
+  return Math.min(max, Math.max(min, integerQuantity));
 }
 
 export const createDummyCartItem = (id: number): Omit<CartItem, "id"> => {
