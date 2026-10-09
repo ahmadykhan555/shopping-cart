@@ -42,3 +42,5 @@ __screenshots__/
 .vscode/*
 
 Readme 2.md
+
+.env
